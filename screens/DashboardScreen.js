@@ -1,90 +1,197 @@
 import React, { useState } from "react";
+import { ScrollView } from "react-native-gesture-handler";
 import { View, Text, StyleSheet, Platform, SafeAreaView } from "react-native";
 import { Appbar, Avatar, IconButton } from "react-native-paper";
-import { Octicons, FontAwesome, Entypo } from "@expo/vector-icons";
-import { ScrollView } from "react-native-gesture-handler";
-import TealButton from "../components/TealButton/TealButton";
-import BatonAccordian from "../components/BatonAccordian/BatonAccordian";
+import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
+import Modal from "react-native-modal";
+
+import {
+  BatonAccordian,
+  BudgetComponent,
+  MemberSelectionComponent,
+  PostUpdateComponent,
+  Selectable,
+  TealButton,
+} from "../components";
 import { colors } from "../utilities/colors";
-import Selectable from "../components/Selectable/Selectable";
 
 export default function DashboardScreen({ navigation }) {
   const [mode, setMode] = useState(0);
+  const [activeTitle, setActiveTitle] = useState("Dummy Title");
+  const [activeComponent, setActiveComponent] = useState(null);
+  const [activeItemIndex, setActiveItemIndex] = useState(-1);
+  const [teamMemberData, setTeamMemberData] = useState({
+    text: "Select a team member",
+    icon: (
+      <Avatar.Icon
+        size={40}
+        icon={({ color, size }) => (
+          <AntDesign name="user" size={size} color={color} />
+        )}
+      />
+    ),
+  });
+  const [dateData, setDateData] = useState("Set a deadline");
+  const [budgetData, setBudgetData] = useState("Set a budget");
+  const [postUpdateData, setPostUpdateData] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const handleFormItemRender = (title, component, index) => {
+    setActiveComponent(component);
+    setActiveItemIndex(index);
+    setActiveTitle(title);
+    toggleModal();
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <Appbar style={{ justifyContent: "space-between" }}>
-        <Appbar.Action
-          icon="menu"
-          // {({ color, size }) => (
-          //   <Octicons name="three-bars" size={size} color={color} />
-          // )}
-          onPress={() => navigation.openDrawer()}
-        />
-        <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
-        <Appbar.Action icon="magnify" onPress={() => {}} />
-      </Appbar>
       {mode === 0 ? (
-        <ScrollView style={{ flex: 1, padding: 25 }}>
-          <Text style={{ fontSize: 24 }}>Dashboard</Text>
-          <View style={{ marginTop: 15 }}>
-            <TealButton
-              text="Create"
-              icon={() => <Entypo name="plus" size={24} color="white" />}
-              style={{ width: 150 }}
-              onPress={() => setMode(1)}
+        <>
+          <Appbar style={{ justifyContent: "space-between" }}>
+            <Appbar.Action
+              icon="menu"
+              // {({ color, size }) => (
+              //   <Octicons name="three-bars" size={size} color={color} />
+              // )}
+              onPress={() => navigation.openDrawer()}
             />
-          </View>
-          {/* Batons View */}
-          <View style={{ marginTop: 15 }}>
-            <BatonAccordian
-              title="Pending Batons (1)"
-              bgColor={colors.cgLight95}
-            />
-          </View>
-        </ScrollView>
+            <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
+            <Appbar.Action icon="magnify" onPress={() => {}} />
+          </Appbar>
+          <ScrollView style={{ flex: 1, padding: 25 }}>
+            <Text style={{ fontSize: 24 }}>Dashboard</Text>
+            <View style={{ marginTop: 15 }}>
+              <TealButton
+                text="Create"
+                icon={() => <Entypo name="plus" size={24} color="white" />}
+                style={{ width: 150 }}
+                onPress={() => setMode(1)}
+              />
+            </View>
+            {/* Batons View */}
+            <View style={{ marginTop: 15 }}>
+              <BatonAccordian
+                title="Pending Batons (1)"
+                bgColor={colors.cgLight95}
+              />
+            </View>
+          </ScrollView>
+        </>
       ) : (
         <ScrollView style={{ flex: 1 }}>
+          {/* Modal Section */}
+          <Modal isVisible={isModalVisible}>
+            <View style={{ backgroundColor: "white" }}>
+              <View style={styles.modalTitleContainer}>
+                <Text style={styles.modalTitle}>{activeTitle}</Text>
+                <IconButton icon="close" onPress={toggleModal} />
+              </View>
+              {activeComponent}
+            </View>
+          </Modal>
+
+          {/* Form Section */}
           <IconButton icon="arrow-left" onPress={() => setMode(0)} size={26} />
           <View style={{ paddingLeft: 20, paddingRight: 20 }}>
             <Text style={{ fontSize: 24 }}>Get new city permit</Text>
             <Selectable
+              bgColor="white"
+              textColor="black"
+              style={{ marginTop: 25 }}
+            >
+              Some Description
+            </Selectable>
+            <Selectable
               bgColor={colors.tealLight90}
-              icon={
-                <Avatar.Icon size={40} icon="person" />
-                // <Avatar.Image
-                //   size={24}
-                //   source={{
-                //     uri: "https://callstack.github.io/react-native-paper/screenshots/avatar-image.png",
-                //   }}
-                // />
+              icon={teamMemberData.icon}
+              isActive={teamMemberData.text != "Select a team member"}
+              onPress={() =>
+                handleFormItemRender(
+                  "Select a team member",
+                  <MemberSelectionComponent
+                    setSelectedItem={setTeamMemberData}
+                    closeModal={() => setModalVisible(false)}
+                  />,
+                  1
+                )
               }
             >
-              Select a member
+              {teamMemberData.text}
             </Selectable>
             <Selectable
               bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="calender" />}
+              icon={
+                <Avatar.Icon
+                  size={40}
+                  icon={({ color, size }) => (
+                    <AntDesign name="calendar" size={size} color={color} />
+                  )}
+                />
+              }
+              onPress={() => handleFormItemRender("Set a deadline", null, 2)}
             >
-              Set a deadline
+              {dateData}
             </Selectable>
             <Selectable
               bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="calender" />}
+              icon={
+                <Avatar.Icon
+                  size={40}
+                  icon={({ color, size }) => (
+                    <FontAwesome name="dollar" size={size} color={color} />
+                  )}
+                />
+              }
+              onPress={() =>
+                handleFormItemRender(
+                  "Set a budget",
+                  <BudgetComponent
+                    selectedItem={budgetData}
+                    setSelectedItem={setBudgetData}
+                    closeModal={() => setModalVisible(false)}
+                  />,
+                  3
+                )
+              }
+              isActive={budgetData != "Set a budget"}
             >
-              Set a budget
+              {budgetData}
             </Selectable>
             <Selectable
               bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="calender" />}
+              icon={<Avatar.Icon size={40} icon="attachment" />}
+              onPress={() => handleFormItemRender("Attach a file", null, 4)}
             >
               Attach a file
             </Selectable>
             <Selectable
               bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="calender" />}
+              icon={<Avatar.Icon size={40} icon="post" />}
+              onPress={() =>
+                handleFormItemRender(
+                  "Post an update",
+                  <PostUpdateComponent
+                    selectedItem={postUpdateData}
+                    setSelectedItem={setPostUpdateData}
+                    closeModal={() => setModalVisible(false)}
+                  />,
+                  5
+                )
+              }
+              isActive={postUpdateData != ""}
             >
               Post an update
+            </Selectable>
+            <Selectable
+              isActive={true}
+              contentStyle={{ justifyContent: "center" }}
+              // disabled={true}
+              onPress={() => null}
+            >
+              Pass
             </Selectable>
           </View>
         </ScrollView>
@@ -95,4 +202,16 @@ export default function DashboardScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: Platform.OS === "android" ? 24 : 0 },
+  modalTitleContainer: {
+    height: 50,
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomColor: "grey",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginLeft: 15,
+  },
 });
