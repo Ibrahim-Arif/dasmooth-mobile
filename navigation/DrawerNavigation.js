@@ -5,6 +5,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
+  DrawerItemList,
 } from "@react-navigation/drawer";
 
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
@@ -30,13 +31,18 @@ function CustomDrawerContent(props) {
         <PaperDrawer.Section style={styles.drawerSection}>
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <MaterialIcons name="dashboard" size={size} color={color} />
+              <MaterialIcons
+                name="dashboard"
+                size={size}
+                color={colors.teal100}
+              />
             )}
             label="Dashboard"
             onPress={() => {
               props.navigation.navigate("Dashboard");
             }}
           />
+
           <DrawerItem
             icon={({ color, focused, size }) => (
               <AntDesign name="bells" size={size} color={color} />
@@ -91,7 +97,11 @@ export default function DrawerNavigation() {
   return (
     <Drawer.Navigator
       initialRouteName="Dashboard"
-      screenOptions={{ drawerActiveTintColor: colors.teal100 }}
+      screenOptions={{
+        drawerActiveTintColor: colors.teal100,
+        title: "LOGO",
+        headerShown: false,
+      }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />

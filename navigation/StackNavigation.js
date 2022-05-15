@@ -19,7 +19,7 @@ export const StackNavigaiton = () => {
   return (
     <NavigationContainer theme={MyTheme}>
       <Stack.Navigator
-        initialRouteName="Welcome"
+        initialRouteName="Main"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="SignIn" component={SignInScreen} />

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "react-native-paper";
 import { colors } from "../../utilities/colors";
 
-export default function TealButton({ onPress, icon, text }) {
+export default function TealButton({ onPress, icon, text, style }) {
   return (
     <Button
       icon={icon}
@@ -14,8 +14,9 @@ export default function TealButton({ onPress, icon, text }) {
         justifyContent: "center",
         width: 250,
         height: 50,
+        ...style,
       }}
-      contentStyle={{ width: 250, height: 50 }}
+      contentStyle={{ width: 250, height: 50, ...style }}
     >
       {text}
     </Button>

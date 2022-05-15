@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { DefaultTheme, TextInput } from "react-native-paper";
+import ColoredText from "../components/ColoredText/ColoredText";
 
 import TealButton from "../components/TealButton/TealButton";
 import { colors } from "../utilities/colors";
@@ -48,12 +49,13 @@ export default function SignUpScreen({ navigation }) {
               height: 350, // backgroundColor: "tomato",
               justifyContent: "space-around",
               alignItems: "center",
+              marginTop: 50,
             },
           ]}
         >
           <TextInput
             label="Email"
-            right={<TextInput.Icon name="eye" />}
+            right={<TextInput.Icon name="email" />}
             style={{ height: 60, width: 300 }}
             theme={inputTheme}
           />

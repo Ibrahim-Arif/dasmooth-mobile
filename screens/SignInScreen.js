@@ -49,12 +49,13 @@ export default function SignInScreen({ navigation }) {
               height: 350, // backgroundColor: "tomato",
               justifyContent: "space-around",
               alignItems: "center",
+              marginTop: 50,
             },
           ]}
         >
           <TextInput
             label="Email"
-            right={<TextInput.Icon name="eye" />}
+            right={<TextInput.Icon name="email" />}
             style={{ height: 60, width: 300 }}
             theme={inputTheme}
           />
@@ -69,6 +70,14 @@ export default function SignInScreen({ navigation }) {
             text="Login"
             onPress={() => navigation.navigate("Main")}
           />
+          <ColoredText
+            color={colors.teal100}
+            underLine
+            style={{ fontSize: 16 }}
+            onPress={() => null}
+          >
+            Forgot your password?
+          </ColoredText>
           <View style={styles.textContainer}>
             <ColoredText color="white" style={{ fontSize: 16 }}>
               Don't have an account?
