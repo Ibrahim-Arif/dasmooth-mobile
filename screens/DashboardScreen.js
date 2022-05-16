@@ -8,6 +8,8 @@ import Modal from "react-native-modal";
 import {
   BatonAccordian,
   BudgetComponent,
+  DateTimeComponent,
+  FileAttachmentComponent,
   MemberSelectionComponent,
   PostUpdateComponent,
   Selectable,
@@ -34,8 +36,27 @@ export default function DashboardScreen({ navigation }) {
   const [dateData, setDateData] = useState("Set a deadline");
   const [budgetData, setBudgetData] = useState("Set a budget");
   const [postUpdateData, setPostUpdateData] = useState("");
+  const [filesList, setFilesList] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
-
+  const flushData = () => {
+    setActiveComponent(null);
+    setActiveItemIndex(-1);
+    setActiveTitle("");
+    setTeamMemberData({
+      text: "Select a team member",
+      icon: (
+        <Avatar.Icon
+          size={40}
+          icon={({ color, size }) => (
+            <AntDesign name="user" size={size} color={color} />
+          )}
+        />
+      ),
+    });
+    setDateData("Set a deadline");
+    setBudgetData("Set a budget");
+    setPostUpdateData("");
+  };
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -68,7 +89,10 @@ export default function DashboardScreen({ navigation }) {
                 text="Create"
                 icon={() => <Entypo name="plus" size={24} color="white" />}
                 style={{ width: 150 }}
-                onPress={() => setMode(1)}
+                onPress={() => {
+                  flushData();
+                  setMode(1);
+                }}
               />
             </View>
             {/* Batons View */}
@@ -131,7 +155,18 @@ export default function DashboardScreen({ navigation }) {
                   )}
                 />
               }
-              onPress={() => handleFormItemRender("Set a deadline", null, 2)}
+              isActive={dateData != "Set a deadline"}
+              onPress={() =>
+                handleFormItemRender(
+                  "Set a deadline",
+                  <DateTimeComponent
+                    selectedItem={dateData}
+                    setSelectedItem={setDateData}
+                    closeModal={() => setModalVisible(false)}
+                  />,
+                  2
+                )
+              }
             >
               {dateData}
             </Selectable>
@@ -163,9 +198,22 @@ export default function DashboardScreen({ navigation }) {
             <Selectable
               bgColor={colors.tealLight90}
               icon={<Avatar.Icon size={40} icon="attachment" />}
-              onPress={() => handleFormItemRender("Attach a file", null, 4)}
+              isActive={filesList.length > 0}
+              onPress={() =>
+                handleFormItemRender(
+                  "Attach a file",
+                  <FileAttachmentComponent
+                    selectedItem={filesList}
+                    setSelectedItem={setFilesList}
+                    closeModal={() => setModalVisible(false)}
+                  />,
+                  4
+                )
+              }
             >
-              Attach a file
+              {filesList.length > 0
+                ? `${filesList.length} files attached`
+                : "Attach a file"}
             </Selectable>
             <Selectable
               bgColor={colors.tealLight90}

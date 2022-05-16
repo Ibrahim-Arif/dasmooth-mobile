@@ -10,6 +10,7 @@ export default function Selectable({
   textColor = null,
   style,
   contentStyle,
+  labelStyle,
   disabled = false,
   children,
 }) {
@@ -33,6 +34,7 @@ export default function Selectable({
       }}
       labelStyle={{
         color: textColor ? textColor : isActive ? "white" : colors.teal100,
+        ...labelStyle,
       }}
       onPress={onPress}
       icon={() => icon}
