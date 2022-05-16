@@ -1,6 +1,6 @@
 import React from "react";
 import { AppBarView } from "../components";
 
-export default function NotificationScreen({ navigation }) {
+export default function ProfileSettingScreen({ navigation }) {
   return <AppBarView navigation={navigation}></AppBarView>;
 }

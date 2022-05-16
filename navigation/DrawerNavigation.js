@@ -10,7 +10,13 @@ import {
 
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Avatar, Title, Drawer as PaperDrawer } from "react-native-paper";
-import { DashboardScreen, NotificationScreen } from "../screens";
+import {
+  DashboardScreen,
+  DeleteBatonScreen,
+  NotificationScreen,
+  ProfileSettingScreen,
+  TeamMembersScreen,
+} from "../screens";
 import { colors } from "../utilities/colors";
 
 const Drawer = createDrawerNavigator();
@@ -45,7 +51,7 @@ function CustomDrawerContent(props) {
 
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <AntDesign name="bells" size={size} color={color} />
+              <AntDesign name="bells" size={size} color={colors.teal100} />
             )}
             label="Notification"
             onPress={() => {
@@ -54,7 +60,7 @@ function CustomDrawerContent(props) {
           />
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <AntDesign name="setting" size={size} color={color} />
+              <AntDesign name="setting" size={size} color={colors.teal100} />
             )}
             label="Profile Settings"
             onPress={() => {
@@ -63,7 +69,7 @@ function CustomDrawerContent(props) {
           />
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <AntDesign name="team" size={size} color={color} />
+              <AntDesign name="team" size={size} color={colors.teal100} />
             )}
             label="Team Members"
             onPress={() => {
@@ -72,7 +78,7 @@ function CustomDrawerContent(props) {
           />
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <AntDesign name="delete" size={size} color={color} />
+              <AntDesign name="delete" size={size} color={colors.teal100} />
             )}
             label="Delete Batons"
             onPress={() => {
@@ -81,7 +87,7 @@ function CustomDrawerContent(props) {
           />
           <DrawerItem
             icon={({ color, focused, size }) => (
-              <AntDesign name="logout" size={size} color={color} />
+              <AntDesign name="logout" size={size} color={colors.teal100} />
             )}
             label="Logout"
             onPress={() => {
@@ -106,6 +112,9 @@ export default function DrawerNavigation() {
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Notification" component={NotificationScreen} />
+      <Drawer.Screen name="ProfileSettings" component={ProfileSettingScreen} />
+      <Drawer.Screen name="TeamMembers" component={TeamMembersScreen} />
+      <Drawer.Screen name="DeleteBatons" component={DeleteBatonScreen} />
     </Drawer.Navigator>
   );
 }
