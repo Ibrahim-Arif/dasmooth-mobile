@@ -5,19 +5,18 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
-  DrawerItemList,
 } from "@react-navigation/drawer";
 
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Avatar, Title, Drawer as PaperDrawer } from "react-native-paper";
 import {
-  DashboardScreen,
   DeleteBatonScreen,
   NotificationScreen,
   ProfileSettingScreen,
   TeamMembersScreen,
 } from "../screens";
 import { colors } from "../utilities/colors";
+import { DashboardNavigaiton } from "./DashboardNavigation";
 
 const Drawer = createDrawerNavigator();
 
@@ -110,7 +109,7 @@ export default function DrawerNavigation() {
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+      <Drawer.Screen name="Dashboard" component={DashboardNavigaiton} />
       <Drawer.Screen name="Notification" component={NotificationScreen} />
       <Drawer.Screen name="ProfileSettings" component={ProfileSettingScreen} />
       <Drawer.Screen name="TeamMembers" component={TeamMembersScreen} />

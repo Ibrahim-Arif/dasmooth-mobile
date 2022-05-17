@@ -6,7 +6,9 @@ import SignInScreen from "./SignInScreen";
 import SignUpScreen from "./SignUpScreen";
 import TeamMembersScreen from "./TeamMembersScreen";
 import WelcomeScreen from "./WelcomeScreen";
+import BatonFormScreen from "./BatonFormScreen";
 export {
+  BatonFormScreen,
   TeamMembersScreen,
   ProfileSettingScreen,
   DeleteBatonScreen,

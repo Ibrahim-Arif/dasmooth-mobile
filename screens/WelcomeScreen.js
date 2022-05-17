@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, Image } from "react-native";
+import { placeHolder } from "../assets";
 import ColoredText from "../components/ColoredText/ColoredText";
 import TealButton from "../components/TealButton/TealButton";
 import { colors } from "../utilities/colors";
@@ -20,8 +21,17 @@ export default function WelcomeScreen({ navigation }) {
       >
         <Text style={styles.logo}>LOGO</Text>
       </View>
-      <View style={[styles.flexContainer, { flex: 4 }]}>
-        <View style={{ width: "100%" }}></View>
+      <View
+        style={[
+          styles.flexContainer,
+          { flex: 4, justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <Image source={placeHolder} style={{ height: 250, width: 250 }} />
+
+        <Text style={{ color: "white", fontSize: 20, marginTop: 25 }}>
+          Text
+        </Text>
       </View>
       <View
         style={[
@@ -37,7 +47,7 @@ export default function WelcomeScreen({ navigation }) {
           onPress={() => navigation.navigate("SignUp")}
         />
         <View style={styles.textContainer}>
-          <ColoredText color="white" style={{ fontSize: 16 }}>
+          <ColoredText color="white" style={{ fontSize: 18 }}>
             Already have an account?
           </ColoredText>
           <ColoredText
@@ -76,7 +86,7 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: "row",
     // backgroundColor: "tomato",
-    width: 250,
+    width: 280,
     justifyContent: "space-around",
     marginTop: 15,
   },
