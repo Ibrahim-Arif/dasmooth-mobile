@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { List } from "react-native-paper";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 
 export default function BatonAccordian({
@@ -20,6 +20,15 @@ export default function BatonAccordian({
     <View style={{ backgroundColor: bgColor }}>
       <List.Accordion
         title={title}
+        right={() => <FontAwesome name="bars" size={20} color="black" />}
+        left={(props) => (
+          <AntDesign
+            name="caretright"
+            size={20}
+            color="black"
+            style={{ transform: [{ rotateX: "-180deg" }] }}
+          />
+        )}
         titleStyle={{ color: "black", fontWeight: "bold" }}
         style={{
           borderTopColor: color,

@@ -1,20 +1,11 @@
 import React, { useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import { View, Text, StyleSheet, Platform, SafeAreaView } from "react-native";
-import { Appbar, Avatar, IconButton } from "react-native-paper";
-import { FontAwesome, AntDesign, Entypo } from "@expo/vector-icons";
-import Modal from "react-native-modal";
+import { Appbar } from "react-native-paper";
+import { Entypo } from "@expo/vector-icons";
+import { Searchbar } from "react-native-paper";
 
-import {
-  BatonAccordian,
-  BudgetComponent,
-  DateTimeComponent,
-  FileAttachmentComponent,
-  MemberSelectionComponent,
-  PostUpdateComponent,
-  Selectable,
-  TealButton,
-} from "../components";
+import { BatonAccordian, TealButton } from "../components";
 import { colors } from "../utilities/colors";
 
 export default function DashboardScreen({ navigation }) {
@@ -50,6 +41,9 @@ export default function DashboardScreen({ navigation }) {
       bgColor: "#FDEEE7",
     },
   ]);
+  const [isSearchMode, setSearchMode] = useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const onChangeSearch = (query) => setSearchQuery(query);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -62,8 +56,27 @@ export default function DashboardScreen({ navigation }) {
             // )}
             onPress={() => navigation.openDrawer()}
           />
-          <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
-          <Appbar.Action icon="magnify" onPress={() => {}} />
+
+          {isSearchMode ? (
+            <Searchbar
+              placeholder="Search"
+              onChangeText={onChangeSearch}
+              value={searchQuery}
+              style={{
+                alignSelf: "center",
+                width: 250,
+                height: 40,
+                borderRadius: 20,
+                elevation: 0,
+              }}
+            />
+          ) : (
+            <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
+          )}
+          <Appbar.Action
+            icon="magnify"
+            onPress={() => setSearchMode(!isSearchMode)}
+          />
         </Appbar>
         <ScrollView style={{ flex: 1, padding: 25 }}>
           <Text style={{ fontSize: 24, color: colors.textColor }}>
