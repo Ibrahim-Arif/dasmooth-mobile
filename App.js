@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { LogBox, StyleSheet, View } from "react-native";
 import { registerRootComponent } from "expo";
 import { StackNavigaiton } from "./navigation/StackNavigation";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
@@ -14,6 +14,9 @@ const theme = {
   },
 };
 export default function App() {
+  LogBox.ignoreAllLogs([
+    "This can break usage such as persisting and restoring state.",
+  ]);
   return (
     <PaperProvider theme={theme}>
       <StackNavigaiton />

@@ -6,7 +6,7 @@ import TealButton from "../TealButton/TealButton";
 export default function PostUpdateComponent({
   selectedItem,
   setSelectedItem,
-  closeModal,
+  closeScreen,
 }) {
   const [text, setText] = React.useState("");
   useEffect(() => setText(selectedItem), []);
@@ -25,7 +25,7 @@ export default function PostUpdateComponent({
           text="POST UPDATE"
           onPress={() => {
             setSelectedItem(text);
-            closeModal();
+            closeScreen();
           }}
         />
       </View>

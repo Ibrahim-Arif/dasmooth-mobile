@@ -6,7 +6,7 @@ import TealButton from "../TealButton/TealButton";
 export default function BudgetComponent({
   selectedItem,
   setSelectedItem,
-  closeModal,
+  closeScreen,
 }) {
   const [text, setText] = React.useState("");
   useEffect(
@@ -28,7 +28,7 @@ export default function BudgetComponent({
           text="SET BUDGET"
           onPress={() => {
             if (text != "") setSelectedItem(text);
-            closeModal();
+            closeScreen();
           }}
         />
       </View>

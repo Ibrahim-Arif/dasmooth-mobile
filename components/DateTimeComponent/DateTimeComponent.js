@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Selectable from "../Selectable/Selectable";
 import moment from "moment";
@@ -10,7 +10,7 @@ import { color } from "react-native-reanimated";
 export default function DateTimeComponent({
   selectedItem,
   setSelectedItem,
-  closeModal,
+  closeScreen,
 }) {
   const [date, setDate] = useState(
     moment().format("dddd, MMMM Do, YYYY").toString()
@@ -63,13 +63,16 @@ export default function DateTimeComponent({
           onCancel={() => setShow(false)}
         />
       </View>
-      <TealButton
-        text="Set Deadline"
-        onPress={() => {
-          setSelectedItem(`${date} at ${time}`);
-          closeModal();
-        }}
-      />
+      <View style={{ marginTop: 25 }}>
+        <TealButton
+          text="Set Deadline"
+          onPress={() => {
+            setSelectedItem(`${date} at ${time}`);
+            closeScreen();
+          }}
+          style={{ width: Dimensions.get("screen").width * 0.9 }}
+        />
+      </View>
     </View>
   );
 }

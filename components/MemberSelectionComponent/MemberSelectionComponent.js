@@ -7,7 +7,7 @@ import TealButton from "../TealButton/TealButton";
 
 export default function MemberSelectionComponent({
   setSelectedItem,
-  closeModal,
+  closeScreen,
 }) {
   const [member, setMember] = useState({ text: "", image: null });
   const data = [
@@ -66,8 +66,8 @@ export default function MemberSelectionComponent({
         <TealButton
           text="SELECT MEMBER"
           onPress={() => {
-            setSelectedItem(member);
-            closeModal();
+            if (member.text != "") setSelectedItem(member);
+            closeScreen();
           }}
         />
       </View>

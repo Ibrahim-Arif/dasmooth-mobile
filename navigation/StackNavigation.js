@@ -4,8 +4,8 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SignInScreen, SignUpScreen, WelcomeScreen } from "../screens";
-import { colors } from "../utilities/colors";
 import DrawerNavigation from "./DrawerNavigation";
+import { colors } from "../utilities/colors";
 
 const Stack = createNativeStackNavigator();
 const MyTheme = {

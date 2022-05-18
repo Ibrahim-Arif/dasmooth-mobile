@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, TouchableNativeFeedback, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import ColoredText from "../ColoredText/ColoredText";
 import TealButton from "../TealButton/TealButton";
@@ -10,7 +10,7 @@ import { colors } from "../../utilities/colors";
 export default function FileAttachmentComponent({
   selectedItem,
   setSelectedItem,
-  closeModal,
+  closeScreen,
 }) {
   const [files, setFiles] = useState(selectedItem);
 
@@ -40,11 +40,19 @@ export default function FileAttachmentComponent({
 
   return (
     <View style={{ padding: 20 }}>
-      <TealButton
+      {/* <TealButton
         text="Attach a file"
         style={{ alignSelf: "center" }}
         onPress={pickImage}
-      />
+      /> */}
+      <TouchableNativeFeedback onPress={pickImage}>
+        <View style={styles.dragDropContainer}>
+          <AntDesign name="inbox" size={45} color={colors.teal100} />
+          <ColoredText>Drag and drop here</ColoredText>
+          <ColoredText>or</ColoredText>
+          <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
+        </View>
+      </TouchableNativeFeedback>
       <View style={{ marginTop: 15 }}>
         {files &&
           files.map((e, index) => (
@@ -74,10 +82,24 @@ export default function FileAttachmentComponent({
           style={{ width: 285 }}
           onPress={() => {
             setSelectedItem(files);
-            closeModal();
+            closeScreen();
           }}
         />
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  dragDropContainer: {
+    paddingLeft: 10,
+    height: 300,
+    marginBottom: 10,
+    borderStyle: "dashed",
+    borderRadius: 1,
+    borderWidth: 1,
+    borderColor: colors.teal100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

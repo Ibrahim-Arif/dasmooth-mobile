@@ -36,7 +36,7 @@ export default function DashboardScreen({ navigation }) {
   const [budgetData, setBudgetData] = useState("Set a budget");
   const [postUpdateData, setPostUpdateData] = useState("");
   const [filesList, setFilesList] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false);
+
   const flushData = () => {
     setActiveComponent(null);
     setActiveItemIndex(-1);
@@ -56,30 +56,10 @@ export default function DashboardScreen({ navigation }) {
     setBudgetData("Set a budget");
     setPostUpdateData("");
   };
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
-  const handleFormItemRender = (title, component, index) => {
-    setActiveComponent(component);
-    setActiveItemIndex(index);
-    setActiveTitle(title);
-    toggleModal();
-  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={{ flex: 1, marginTop: 25 }}>
-        {/* Modal Section */}
-        <Modal isVisible={isModalVisible}>
-          <View style={{ backgroundColor: "white" }}>
-            <View style={styles.modalTitleContainer}>
-              <Text style={styles.modalTitle}>{activeTitle}</Text>
-              <IconButton icon="close" onPress={toggleModal} />
-            </View>
-            {activeComponent}
-          </View>
-        </Modal>
-
         {/* Form Section */}
         <IconButton
           icon="arrow-left"
@@ -101,14 +81,9 @@ export default function DashboardScreen({ navigation }) {
             icon={teamMemberData.icon}
             isActive={teamMemberData.text != "Select a team member"}
             onPress={() =>
-              handleFormItemRender(
-                "Select a team member",
-                <MemberSelectionComponent
-                  setSelectedItem={setTeamMemberData}
-                  closeModal={() => setModalVisible(false)}
-                />,
-                1
-              )
+              navigation.navigate("MemberSelection", {
+                setSelectedItem: (e) => setTeamMemberData(e),
+              })
             }
           >
             {teamMemberData.text}
@@ -125,15 +100,10 @@ export default function DashboardScreen({ navigation }) {
             }
             isActive={dateData != "Set a deadline"}
             onPress={() =>
-              handleFormItemRender(
-                "Set a deadline",
-                <DateTimeComponent
-                  selectedItem={dateData}
-                  setSelectedItem={setDateData}
-                  closeModal={() => setModalVisible(false)}
-                />,
-                2
-              )
+              navigation.navigate("DateSelection", {
+                setSelectedItem: (e) => setDateData(e),
+                selectedItem: dateData,
+              })
             }
           >
             {dateData}
@@ -149,15 +119,10 @@ export default function DashboardScreen({ navigation }) {
               />
             }
             onPress={() =>
-              handleFormItemRender(
-                "Set a budget",
-                <BudgetComponent
-                  selectedItem={budgetData}
-                  setSelectedItem={setBudgetData}
-                  closeModal={() => setModalVisible(false)}
-                />,
-                3
-              )
+              navigation.navigate("BudgetSelection", {
+                setSelectedItem: (e) => setBudgetData(e),
+                selectedItem: budgetData,
+              })
             }
             isActive={budgetData != "Set a budget"}
           >
@@ -168,15 +133,10 @@ export default function DashboardScreen({ navigation }) {
             icon={<Avatar.Icon size={40} icon="attachment" />}
             isActive={filesList.length > 0}
             onPress={() =>
-              handleFormItemRender(
-                "Attach a file",
-                <FileAttachmentComponent
-                  selectedItem={filesList}
-                  setSelectedItem={setFilesList}
-                  closeModal={() => setModalVisible(false)}
-                />,
-                4
-              )
+              navigation.navigate("FileSelection", {
+                setSelectedItem: (e) => setFilesList(e),
+                selectedItem: filesList,
+              })
             }
           >
             {filesList.length > 0
@@ -187,15 +147,10 @@ export default function DashboardScreen({ navigation }) {
             bgColor={colors.tealLight90}
             icon={<Avatar.Icon size={40} icon="post" />}
             onPress={() =>
-              handleFormItemRender(
-                "Post an update",
-                <PostUpdateComponent
-                  selectedItem={postUpdateData}
-                  setSelectedItem={setPostUpdateData}
-                  closeModal={() => setModalVisible(false)}
-                />,
-                5
-              )
+              navigation.navigate("PostUpdateSelection", {
+                setSelectedItem: (e) => setPostUpdateData(e),
+                selectedItem: postUpdateData,
+              })
             }
             isActive={postUpdateData != ""}
           >
@@ -217,16 +172,4 @@ export default function DashboardScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, marginTop: Platform.OS === "android" ? 24 : 0 },
-  modalTitleContainer: {
-    height: 50,
-    borderBottomWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderBottomColor: "grey",
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 20,
-    marginLeft: 15,
-  },
 });

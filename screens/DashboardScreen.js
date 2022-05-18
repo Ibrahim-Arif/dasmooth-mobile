@@ -66,7 +66,9 @@ export default function DashboardScreen({ navigation }) {
           <Appbar.Action icon="magnify" onPress={() => {}} />
         </Appbar>
         <ScrollView style={{ flex: 1, padding: 25 }}>
-          <Text style={{ fontSize: 24 }}>Dashboard</Text>
+          <Text style={{ fontSize: 24, color: colors.textColor }}>
+            Dashboard
+          </Text>
           <View style={{ marginTop: 15 }}>
             <TealButton
               text="Create new baton"
@@ -78,8 +80,8 @@ export default function DashboardScreen({ navigation }) {
             />
           </View>
           {/* Batons View */}
-          {batons.map((e) => (
-            <View style={{ marginTop: 15 }}>
+          {batons.map((e, index) => (
+            <View style={{ marginTop: 15 }} key={index}>
               <BatonAccordian
                 title={`${e.title} (0)`}
                 bgColor={e.bgColor}

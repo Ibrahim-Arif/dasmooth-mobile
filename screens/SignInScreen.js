@@ -5,18 +5,22 @@ import ColoredText from "../components/ColoredText/ColoredText";
 
 import TealButton from "../components/TealButton/TealButton";
 import { colors } from "../utilities/colors";
-
-const inputTheme = {
-  ...DefaultTheme,
-  roundness: 2,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: colors.teal100,
-    // accent: "#f1c40f",
-  },
-};
 export default function SignInScreen({ navigation }) {
   const [text, setText] = React.useState("");
+  const [isFieldActive, setIsFieldActive] = React.useState(false);
+
+  let inputTheme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: colors.teal100,
+      // accent: "#f1c40f",
+      text: isFieldActive ? "black" : "white",
+      background: isFieldActive ? "white" : "transparent",
+      placeholder: isFieldActive ? "black" : "white",
+    },
+  };
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -55,16 +59,20 @@ export default function SignInScreen({ navigation }) {
         >
           <TextInput
             label="Email"
-            right={<TextInput.Icon name="email" />}
-            style={{ height: 60, width: 300 }}
+            // right={<TextInput.Icon name="email" />}
+            style={[{ height: 60, width: 300 }]}
             theme={inputTheme}
+            onBlur={() => setIsFieldActive(false)}
+            onFocus={() => setIsFieldActive(true)}
           />
           <TextInput
             label="Password"
             secureTextEntry
-            right={<TextInput.Icon name="eye" />}
+            // right={<TextInput.Icon name="eye" />}
             style={{ height: 60, width: 300 }}
             theme={inputTheme}
+            onBlur={() => setIsFieldActive(false)}
+            onFocus={() => setIsFieldActive(true)}
           />
           <TealButton
             text="Login"
