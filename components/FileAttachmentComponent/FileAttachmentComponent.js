@@ -40,11 +40,8 @@ export default function FileAttachmentComponent({
 
   return (
     <View style={{ padding: 20 }}>
-      {/* <TealButton
-        text="Attach a file"
-        style={{ alignSelf: "center" }}
-        onPress={pickImage}
-      /> */}
+      {/* Drag and Drop Container */}
+
       <TouchableNativeFeedback onPress={pickImage}>
         <View style={styles.dragDropContainer}>
           <AntDesign name="inbox" size={45} color={colors.teal100} />
@@ -53,6 +50,7 @@ export default function FileAttachmentComponent({
           <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
         </View>
       </TouchableNativeFeedback>
+
       <View style={{ marginTop: 15 }}>
         {files &&
           files.map((e, index) => (
@@ -72,11 +70,11 @@ export default function FileAttachmentComponent({
           ))}
       </View>
 
-      <ColoredText color="teal" style={{ fontSize: 16, marginTop: 15 }}>
+      <ColoredText color="teal" style={styles.attachFileText}>
         {files.length} files attached
       </ColoredText>
 
-      <View style={{ alignSelf: "center", marginTop: 15 }}>
+      <View style={styles.tealButtonContainer}>
         <TealButton
           text="Upload"
           style={{ width: 285 }}
@@ -102,4 +100,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  tealButtonContainer: { alignSelf: "center", marginTop: 15 },
+  attachFileText: { fontSize: 16, marginTop: 15 },
 });

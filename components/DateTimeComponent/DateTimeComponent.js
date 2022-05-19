@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, StyleSheet } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 
@@ -46,13 +46,7 @@ export default function DateTimeComponent({
         <Selectable
           bgColor={colors.teal100}
           isActive={true}
-          style={{
-            alignItems: "center",
-            height: 40,
-            marginTop: 25,
-            width: 250,
-            alignSelf: "center",
-          }}
+          style={styles.selectable}
           contentStyle={{ height: 40 }}
           icon={null}
           onPress={() => setTimePickerVisibility(true)}
@@ -99,3 +93,13 @@ export default function DateTimeComponent({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  selectable: {
+    alignItems: "center",
+    height: 40,
+    marginTop: 25,
+    width: 250,
+    alignSelf: "center",
+  },
+});

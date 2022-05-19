@@ -9,6 +9,7 @@ import { colors } from "../utilities/colors";
 export default function SignUpScreen({ navigation }) {
   const [text, setText] = React.useState("");
   const [isFieldActive, setIsFieldActive] = React.useState(false);
+
   let inputTheme = {
     ...DefaultTheme,
     roundness: 2,

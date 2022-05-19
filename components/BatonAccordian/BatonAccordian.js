@@ -30,14 +30,15 @@ export default function BatonAccordian({
             style={pressed && { transform: [{ rotate: "90deg" }] }}
           />
         )}
-        titleStyle={{ color: "black", fontWeight: "bold" }}
-        style={{
-          borderTopColor: color,
-          borderTopWidth: 3,
-          color: "black",
-          marginTop: 10,
-          backgroundColor: bgColor,
-        }}
+        titleStyle={styles.titleStyle}
+        style={[
+          styles.accordion,
+          {
+            borderTopColor: color,
+
+            backgroundColor: bgColor,
+          },
+        ]}
         onPress={() => setPressed(!pressed)}
       >
         {dummy.map((e, index) => (
@@ -52,14 +53,14 @@ export default function BatonAccordian({
                 borderBottomColor: colors.textColor,
               },
             ]}
-            // onPressIn={() => setPressed(true)}
-            // onPressOut={() => setPressed(false)}
             right={(props) => (
               <List.Icon
                 {...props}
                 icon={() => <AntDesign name="right" size={24} color="black" />}
               />
             )}
+            // onPressIn={() => setPressed(true)}
+            // onPressOut={() => setPressed(false)}
             onPress={onPress}
           />
         ))}
@@ -75,4 +76,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     margin: 10,
   },
+  accordion: { borderTopWidth: 3, color: "black", marginTop: 10 },
+  titleStyle: { color: "black", fontWeight: "bold" },
 });
