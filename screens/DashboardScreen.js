@@ -1,10 +1,19 @@
 import React, { useCallback, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
-import { View, Text, StyleSheet, Platform, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  SafeAreaView,
+  TouchableNativeFeedback,
+} from "react-native";
 import { Appbar } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
 import { Searchbar } from "react-native-paper";
-import SortableList from "react-native-sortable-list";
+import DraggableFlatList, {
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 
 import { BatonAccordian, TealButton } from "../components";
 import { colors } from "../utilities/colors";
@@ -45,6 +54,19 @@ export default function DashboardScreen({ navigation }) {
   const [isSearchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const onChangeSearch = (query) => setSearchQuery(query);
+
+  const renderItem = ({ item, drag, isActive }) => (
+    <ScaleDecorator>
+      <View style={{ marginTop: 15 }}>
+        <BatonAccordian
+          title={`${item.title} (0)`}
+          bgColor={item.bgColor}
+          color={item.borderColor}
+          drag={drag}
+        />
+      </View>
+    </ScaleDecorator>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,7 +116,7 @@ export default function DashboardScreen({ navigation }) {
             />
           </View>
           {/* Batons View */}
-          {batons.map((e, index) => (
+          {/* {batons.map((e, index) => (
             <View style={{ marginTop: 15 }} key={index}>
               <BatonAccordian
                 title={`${e.title} (0)`}
@@ -102,7 +124,13 @@ export default function DashboardScreen({ navigation }) {
                 color={e.borderColor}
               />
             </View>
-          ))}
+          ))} */}
+          <DraggableFlatList
+            data={batons}
+            onDragEnd={({ data }) => setBatons(data)}
+            keyExtractor={(item) => item.title}
+            renderItem={renderItem}
+          />
           <View style={{ height: 50 }}></View>
         </ScrollView>
       </>

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { List } from "react-native-paper";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
@@ -10,6 +10,7 @@ export default function BatonAccordian({
   listItems = [],
   color = "grey",
   bgColor = "white",
+  drag,
 }) {
   // const [expanded, setExpanded] = React.useState(true);
   // const handlePress = () => setExpanded(!expanded);
@@ -20,8 +21,11 @@ export default function BatonAccordian({
   return (
     <View style={{ backgroundColor: bgColor }}>
       <List.Accordion
+        onLongPress={drag}
         title={title}
-        right={() => <FontAwesome name="bars" size={20} color="black" />}
+        right={() => (
+          <FontAwesome name="bars" size={20} color="black" onLongPress={drag} />
+        )}
         left={(props) => (
           <AntDesign
             name="caretright"
