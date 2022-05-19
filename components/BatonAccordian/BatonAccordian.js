@@ -52,7 +52,7 @@ export default function BatonAccordian({
             style={[
               styles.listItem,
               { borderLeftColor: color },
-              !pressed && {
+              {
                 borderBottomWidth: 4,
                 borderBottomColor: colors.textColor,
               },
