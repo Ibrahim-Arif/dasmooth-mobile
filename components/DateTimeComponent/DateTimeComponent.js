@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Dimensions, View } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import Selectable from "../Selectable/Selectable";
+import { View, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
+
 import { colors } from "../../utilities/colors";
 import CalendarPicker from "react-native-calendar-picker/CalendarPicker";
 import TealButton from "../TealButton/TealButton";
-import { color } from "react-native-reanimated";
+import Selectable from "../Selectable/Selectable";
+
 export default function DateTimeComponent({
   selectedItem,
   setSelectedItem,
@@ -16,7 +17,12 @@ export default function DateTimeComponent({
     moment().format("dddd, MMMM Do, YYYY").toString()
   );
   const [time, setTime] = useState("Set Time");
-  const [show, setShow] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
   return (
     <View style={{ alignItems: "center", padding: 20 }}>
       <Selectable
@@ -49,19 +55,37 @@ export default function DateTimeComponent({
           }}
           contentStyle={{ height: 40 }}
           icon={null}
-          onPress={() => setShow(true)}
+          onPress={() => setTimePickerVisibility(true)}
         >
           {time}
         </Selectable>
-        <DateTimePickerModal
-          isVisible={show}
-          mode="time"
-          onConfirm={(e) => {
-            setTime(moment(e).format("h:mm a"));
-            setShow(false);
-          }}
-          onCancel={() => setShow(false)}
-        />
+        <>
+          {Platform.OS === "ios" ? (
+            <DateTimePicker
+              mode="time"
+              style={{ flex: 1 }}
+              value={new Date()}
+              onChange={(event, newTime) => {
+                setTime(moment(newTime).format("hh:mm A"));
+              }}
+            />
+          ) : (
+            isTimePickerVisible && (
+              <>
+                <DateTimePicker
+                  mode="time"
+                  style={{ flex: 1 }}
+                  value={new Date()}
+                  onChange={(event, newTime) => {
+                    setTime(moment(newTime).format("hh:mm A"));
+                    setTimePickerVisibility(false);
+                  }}
+                  t
+                />
+              </>
+            )
+          )}
+        </>
       </View>
       <View style={{ marginTop: 25 }}>
         <TealButton
@@ -70,7 +94,6 @@ export default function DateTimeComponent({
             setSelectedItem(`${date} at ${time}`);
             closeScreen();
           }}
-          style={{ width: Dimensions.get("screen").width * 0.9 }}
         />
       </View>
     </View>

@@ -11,9 +11,10 @@ export default function BatonAccordian({
   color = "grey",
   bgColor = "white",
 }) {
-  const [expanded, setExpanded] = React.useState(true);
+  // const [expanded, setExpanded] = React.useState(true);
+  // const handlePress = () => setExpanded(!expanded);
+
   const [pressed, setPressed] = React.useState(false);
-  const handlePress = () => setExpanded(!expanded);
   const dummy = ["First Item", "Second Item"];
 
   return (
@@ -26,7 +27,7 @@ export default function BatonAccordian({
             name="caretright"
             size={20}
             color="black"
-            style={{ transform: [{ rotateX: "-180deg" }] }}
+            style={pressed && { transform: [{ rotate: "90deg" }] }}
           />
         )}
         titleStyle={{ color: "black", fontWeight: "bold" }}
@@ -37,6 +38,7 @@ export default function BatonAccordian({
           marginTop: 10,
           backgroundColor: bgColor,
         }}
+        onPress={() => setPressed(!pressed)}
       >
         {dummy.map((e, index) => (
           <List.Item
