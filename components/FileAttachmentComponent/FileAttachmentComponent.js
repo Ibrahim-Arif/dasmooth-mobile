@@ -42,7 +42,11 @@ export default function FileAttachmentComponent({
   return (
     <View style={{ padding: 20 }}>
       {/* Drag and Drop Container */}
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        // endFillColor={colors.tealLight90}
+      >
         <TouchableNativeFeedback onPress={pickImage}>
           <View style={styles.dragDropContainer}>
             <AntDesign name="inbox" size={45} color={colors.teal100} />
@@ -85,6 +89,7 @@ export default function FileAttachmentComponent({
             }}
           />
         </View>
+        <View style={{ height: 50 }}></View>
       </ScrollView>
     </View>
   );

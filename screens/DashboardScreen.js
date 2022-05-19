@@ -101,7 +101,10 @@ export default function DashboardScreen({ navigation }) {
             onPress={() => setSearchMode(!isSearchMode)}
           />
         </Appbar>
-        <ScrollView style={{ flex: 1, padding: 25 }}>
+        <ScrollView
+          style={{ flex: 1, padding: 25 }}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={{ fontSize: 24, color: colors.textColor }}>
             Dashboard
           </Text>
@@ -126,6 +129,7 @@ export default function DashboardScreen({ navigation }) {
             </View>
           ))} */}
           <DraggableFlatList
+            scrollEnabled={false}
             data={batons}
             onDragEnd={({ data }) => setBatons(data)}
             keyExtractor={(item) => item.title}

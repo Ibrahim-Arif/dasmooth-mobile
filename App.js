@@ -13,6 +13,7 @@ const theme = {
     primary: colors.teal100,
   },
 };
+// console.log(DefaultTheme.colors);
 export default function App() {
   LogBox.ignoreAllLogs([
     "This can break usage such as persisting and restoring state.",
