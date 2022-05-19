@@ -6,6 +6,7 @@ import TealButton from "../TealButton/TealButton";
 import Selectable from "../Selectable/Selectable";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function FileAttachmentComponent({
   selectedItem,
@@ -41,49 +42,50 @@ export default function FileAttachmentComponent({
   return (
     <View style={{ padding: 20 }}>
       {/* Drag and Drop Container */}
+      <ScrollView>
+        <TouchableNativeFeedback onPress={pickImage}>
+          <View style={styles.dragDropContainer}>
+            <AntDesign name="inbox" size={45} color={colors.teal100} />
+            <ColoredText>Drag and drop here</ColoredText>
+            <ColoredText>or</ColoredText>
+            <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
+          </View>
+        </TouchableNativeFeedback>
 
-      <TouchableNativeFeedback onPress={pickImage}>
-        <View style={styles.dragDropContainer}>
-          <AntDesign name="inbox" size={45} color={colors.teal100} />
-          <ColoredText>Drag and drop here</ColoredText>
-          <ColoredText>or</ColoredText>
-          <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
+        <View style={{ marginTop: 15 }}>
+          {files &&
+            files.map((e, index) => (
+              <Selectable
+                key={index}
+                isActive={false}
+                bgColor={colors.tealLight95}
+                onPress={() => handleRemoveFile(index)}
+                icon={
+                  <AntDesign name="delete" size={12} color={colors.teal100} />
+                }
+                style={{ height: 35 }}
+                contentStyle={{ height: 35 }}
+              >
+                {e.fileName}
+              </Selectable>
+            ))}
         </View>
-      </TouchableNativeFeedback>
 
-      <View style={{ marginTop: 15 }}>
-        {files &&
-          files.map((e, index) => (
-            <Selectable
-              key={index}
-              isActive={false}
-              bgColor={colors.tealLight95}
-              onPress={() => handleRemoveFile(index)}
-              icon={
-                <AntDesign name="delete" size={12} color={colors.teal100} />
-              }
-              style={{ height: 35 }}
-              contentStyle={{ height: 35 }}
-            >
-              {e.fileName}
-            </Selectable>
-          ))}
-      </View>
+        <ColoredText color="teal" style={styles.attachFileText}>
+          {files.length} files attached
+        </ColoredText>
 
-      <ColoredText color="teal" style={styles.attachFileText}>
-        {files.length} files attached
-      </ColoredText>
-
-      <View style={styles.tealButtonContainer}>
-        <TealButton
-          text="Upload"
-          style={{ width: 285 }}
-          onPress={() => {
-            setSelectedItem(files);
-            closeScreen();
-          }}
-        />
-      </View>
+        <View style={styles.tealButtonContainer}>
+          <TealButton
+            text="Upload"
+            style={{ width: 285 }}
+            onPress={() => {
+              setSelectedItem(files);
+              closeScreen();
+            }}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 }
