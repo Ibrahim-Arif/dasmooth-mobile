@@ -1,4 +1,5 @@
 import { Dimensions } from "react-native";
+import Interpolator from "./Interpolator";
 
 const screenHeight = Dimensions.get("screen").height;
 const screenWidth = Dimensions.get("screen").width;

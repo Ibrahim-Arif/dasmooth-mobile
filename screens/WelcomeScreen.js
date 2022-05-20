@@ -9,12 +9,22 @@ import {
   Platform,
 } from "react-native";
 
-import { logo, placeHolder } from "../assets";
+import { logo, placeHolder, testImage } from "../assets";
 import { ColoredText, TealButton } from "../components";
 import { colors } from "../utilities/colors";
+import Interpolator from "../utilities/Interpolator";
 import { heights, widths } from "../utilities/sizes";
 
 export default function WelcomeScreen({ navigation }) {
+  const fontSizeInterpolator = Interpolator.getInterpolator({
+    input: [4, 5, 6, 7, 8, 10, 11, 13, 40],
+    output: [45, 45, 32, 28, 28, 22, 19, 15, 10],
+  });
+  // const text =
+  // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum";
+
+  const text = "text";
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -29,7 +39,10 @@ export default function WelcomeScreen({ navigation }) {
       >
         <Image
           source={logo}
-          style={{ height: heights.height10p, width: widths.width60p }}
+          style={{
+            height: heights.height10p,
+            width: widths.width60p,
+          }}
         />
       </View>
       <View
@@ -39,12 +52,24 @@ export default function WelcomeScreen({ navigation }) {
         ]}
       >
         <Image
-          source={placeHolder}
-          style={{ height: heights.height30p, width: widths.width65p }}
+          source={testImage}
+          style={{
+            height: heights.height30p,
+            width: widths.width65p,
+          }}
         />
 
-        <Text style={{ color: "white", fontSize: 20, marginTop: 25 }}>
-          Text
+        <Text
+          style={{
+            color: "white",
+            fontSize: fontSizeInterpolator(text.length),
+            textAlign: "justify",
+            marginTop: 15,
+            marginLeft: 15,
+            marginRight: 15,
+          }}
+        >
+          {text}
         </Text>
       </View>
       <View
