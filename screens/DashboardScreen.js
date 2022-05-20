@@ -101,9 +101,9 @@ export default function DashboardScreen({ navigation }) {
             onPress={() => setSearchMode(!isSearchMode)}
           />
         </Appbar>
-        <ScrollView
-          style={{ flex: 1, padding: 25 }}
-          showsVerticalScrollIndicator={false}
+        <View
+          style={{ flex: 1, margin: 25, flexGrow: 1 }}
+          // showsVerticalScrollIndicator={false}
         >
           <Text style={{ fontSize: 24, color: colors.textColor }}>
             Dashboard
@@ -118,25 +118,16 @@ export default function DashboardScreen({ navigation }) {
               }}
             />
           </View>
-          {/* Batons View */}
-          {/* {batons.map((e, index) => (
-            <View style={{ marginTop: 15 }} key={index}>
-              <BatonAccordian
-                title={`${e.title} (0)`}
-                bgColor={e.bgColor}
-                color={e.borderColor}
-              />
-            </View>
-          ))} */}
+
           <DraggableFlatList
-            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={<View style={{ height: 100 }}></View>}
             data={batons}
             onDragEnd={({ data }) => setBatons(data)}
             keyExtractor={(item) => item.title}
             renderItem={renderItem}
           />
-          <View style={{ height: 50 }}></View>
-        </ScrollView>
+        </View>
       </>
     </SafeAreaView>
   );

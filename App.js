@@ -15,8 +15,8 @@ const theme = {
 };
 // console.log(DefaultTheme.colors);
 export default function App() {
-  LogBox.ignoreAllLogs([
-    "This can break usage such as persisting and restoring state.",
+  LogBox.ignoreLogs([
+    "Non-serializable values were found in the navigation state",
   ]);
   return (
     <PaperProvider theme={theme}>
