@@ -7,6 +7,7 @@ import {
   Platform,
   SafeAreaView,
   TouchableNativeFeedback,
+  Image,
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
@@ -17,6 +18,7 @@ import DraggableFlatList, {
 
 import { BatonAccordian, TealButton } from "../components";
 import { colors } from "../utilities/colors";
+import { logo } from "../assets";
 
 export default function DashboardScreen({ navigation }) {
   const [batons, setBatons] = useState([
@@ -94,7 +96,15 @@ export default function DashboardScreen({ navigation }) {
               }}
             />
           ) : (
-            <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
+            <View>
+              <Image
+                source={logo}
+                style={{
+                  height: 45,
+                  resizeMode: "contain",
+                }}
+              />
+            </View>
           )}
           <Appbar.Action
             icon="magnify"

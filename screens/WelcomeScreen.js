@@ -1,9 +1,16 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, Image } from "react-native";
-import { placeHolder } from "../assets";
-import ColoredText from "../components/ColoredText/ColoredText";
-import TealButton from "../components/TealButton/TealButton";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  Platform,
+} from "react-native";
+
+import { logo, placeHolder } from "../assets";
+import { ColoredText, TealButton } from "../components";
 import { colors } from "../utilities/colors";
 
 export default function WelcomeScreen({ navigation }) {
@@ -16,10 +23,11 @@ export default function WelcomeScreen({ navigation }) {
           {
             flex: 2,
             // backgroundColor: "tomato",
+            marginTop: 10,
           },
         ]}
       >
-        <Text style={styles.logo}>LOGO</Text>
+        <Image source={logo} />
       </View>
       <View
         style={[
@@ -66,6 +74,7 @@ export default function WelcomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: Platform.OS == "android" ? 25 : 0,
     flex: 1,
     backgroundColor: colors.bgColor,
     alignItems: "center",

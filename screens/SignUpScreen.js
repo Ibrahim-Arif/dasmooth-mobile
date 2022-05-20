@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { DefaultTheme, TextInput } from "react-native-paper";
-import ColoredText from "../components/ColoredText/ColoredText";
 
-import TealButton from "../components/TealButton/TealButton";
+import { ColoredText, TealButton } from "../components";
+import { logo } from "../assets";
 import { colors } from "../utilities/colors";
 
 export default function SignUpScreen({ navigation }) {
@@ -32,10 +32,11 @@ export default function SignUpScreen({ navigation }) {
             {
               height: 150,
               // backgroundColor: "tomato",
+              marginTop: 30,
             },
           ]}
         >
-          <Text style={styles.logo}>LOGO</Text>
+          <Image source={logo} />
         </View>
         <View
           style={[

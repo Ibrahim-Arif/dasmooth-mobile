@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { DefaultTheme, TextInput } from "react-native-paper";
-import ColoredText from "../components/ColoredText/ColoredText";
+import { logo } from "../assets";
 
-import TealButton from "../components/TealButton/TealButton";
+import { ColoredText, TealButton } from "../components";
 import { colors } from "../utilities/colors";
 export default function SignInScreen({ navigation }) {
   const [text, setText] = React.useState("");
@@ -21,6 +21,7 @@ export default function SignInScreen({ navigation }) {
       placeholder: isFieldActive ? "black" : "white",
     },
   };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -30,10 +31,11 @@ export default function SignInScreen({ navigation }) {
             {
               height: 150,
               // backgroundColor: "tomato",
+              marginTop: 30,
             },
           ]}
         >
-          <Text style={styles.logo}>LOGO</Text>
+          <Image source={logo} style={styles.logo} />
         </View>
         <View
           style={[
@@ -132,8 +134,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   logo: {
-    fontSize: 48,
-    color: "white",
+    // marginTop: 50,
   },
   welcomeBackText: { fontSize: 26, color: "white" },
   flexContainer: {
