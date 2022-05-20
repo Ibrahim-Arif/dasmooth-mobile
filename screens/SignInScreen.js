@@ -5,6 +5,8 @@ import { logo } from "../assets";
 
 import { ColoredText, TealButton } from "../components";
 import { colors } from "../utilities/colors";
+import { heights, widths } from "../utilities/sizes";
+
 export default function SignInScreen({ navigation }) {
   const [text, setText] = React.useState("");
   const [isFieldActive, setIsFieldActive] = React.useState(false);
@@ -35,7 +37,10 @@ export default function SignInScreen({ navigation }) {
             },
           ]}
         >
-          <Image source={logo} style={styles.logo} />
+          <Image
+            source={logo}
+            style={{ height: heights.height10p, width: widths.width60p }}
+          />
         </View>
         <View
           style={[

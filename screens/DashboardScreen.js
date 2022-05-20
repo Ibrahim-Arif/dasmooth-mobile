@@ -1,12 +1,11 @@
-import React, { useCallback, useState } from "react";
-import { ScrollView } from "react-native-gesture-handler";
+import React, { useState } from "react";
+
 import {
   View,
   Text,
   StyleSheet,
   Platform,
   SafeAreaView,
-  TouchableNativeFeedback,
   Image,
 } from "react-native";
 import { Appbar } from "react-native-paper";
@@ -74,13 +73,7 @@ export default function DashboardScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <>
         <Appbar style={{ justifyContent: "space-between" }}>
-          <Appbar.Action
-            icon="menu"
-            // {({ color, size }) => (
-            //   <Octicons name="three-bars" size={size} color={color} />
-            // )}
-            onPress={() => navigation.openDrawer()}
-          />
+          <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />
 
           {isSearchMode ? (
             <Searchbar

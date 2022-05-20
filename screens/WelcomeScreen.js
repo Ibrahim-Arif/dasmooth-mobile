@@ -12,6 +12,7 @@ import {
 import { logo, placeHolder } from "../assets";
 import { ColoredText, TealButton } from "../components";
 import { colors } from "../utilities/colors";
+import { heights, widths } from "../utilities/sizes";
 
 export default function WelcomeScreen({ navigation }) {
   return (
@@ -22,12 +23,14 @@ export default function WelcomeScreen({ navigation }) {
           styles.flexContainer,
           {
             flex: 2,
-            // backgroundColor: "tomato",
             marginTop: 10,
           },
         ]}
       >
-        <Image source={logo} />
+        <Image
+          source={logo}
+          style={{ height: heights.height10p, width: widths.width60p }}
+        />
       </View>
       <View
         style={[
@@ -35,7 +38,10 @@ export default function WelcomeScreen({ navigation }) {
           { flex: 4, justifyContent: "center", alignItems: "center" },
         ]}
       >
-        <Image source={placeHolder} style={{ height: 250, width: 250 }} />
+        <Image
+          source={placeHolder}
+          style={{ height: heights.height30p, width: widths.width65p }}
+        />
 
         <Text style={{ color: "white", fontSize: 20, marginTop: 25 }}>
           Text

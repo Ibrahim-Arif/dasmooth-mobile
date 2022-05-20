@@ -5,6 +5,7 @@ import { DefaultTheme, TextInput } from "react-native-paper";
 import { ColoredText, TealButton } from "../components";
 import { logo } from "../assets";
 import { colors } from "../utilities/colors";
+import { heights, widths } from "../utilities/sizes";
 
 export default function SignUpScreen({ navigation }) {
   const [text, setText] = React.useState("");
@@ -36,7 +37,10 @@ export default function SignUpScreen({ navigation }) {
             },
           ]}
         >
-          <Image source={logo} />
+          <Image
+            source={logo}
+            style={{ height: heights.height10p, width: widths.width60p }}
+          />
         </View>
         <View
           style={[
