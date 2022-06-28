@@ -1,15 +1,28 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
-import { DefaultTheme, TextInput } from "react-native-paper";
+import React, { isValidElement, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { DefaultTheme, TextInput, HelperText } from "react-native-paper";
 import { logo } from "../assets";
 
 import { ColoredText, TealButton } from "../components";
+import { handleSignIn } from "../services/handleSignIn";
 import { colors } from "../utilities/colors";
 import { heights, widths } from "../utilities/sizes";
+import { useToast } from "react-native-toast-notifications";
 
 export default function SignInScreen({ navigation }) {
-  const [text, setText] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [isFieldActive, setIsFieldActive] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState({ email: "", password: "" });
+  const toast = useToast();
 
   let inputTheme = {
     ...DefaultTheme,
@@ -23,7 +36,32 @@ export default function SignInScreen({ navigation }) {
       placeholder: isFieldActive ? "black" : "white",
     },
   };
+  useEffect(() => {
+    if (email != "") {
+      if (!email.includes("@")) {
+        setErrors({ ...errors, email: "Enter a valid email address" });
+      } else {
+        setErrors({ ...errors, email: "" });
+      }
+    }
+    if (password != "") {
+      setErrors({ ...errors, password: "" });
+    }
+  }, [email, password]);
 
+  const checkValidation = () => {
+    if (email == "") {
+      setErrors({ ...errors, email: "Enter a email" });
+    } else {
+      setErrors({ ...errors, email: "" });
+    }
+
+    // if (password == "") {
+    //   setErrors({ ...errors, password: "Enter a password" });
+    // } else {
+    //   setErrors({ ...errors, password: "" });
+    // }
+  };
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -71,7 +109,14 @@ export default function SignInScreen({ navigation }) {
             theme={inputTheme}
             onBlur={() => setIsFieldActive(false)}
             onFocus={() => setIsFieldActive(true)}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
+
+          <Text style={{ color: colors.danger }} visible={errors.email != ""}>
+            {errors.email}
+          </Text>
+
           <TextInput
             label="Password"
             secureTextEntry
@@ -80,16 +125,47 @@ export default function SignInScreen({ navigation }) {
             theme={inputTheme}
             onBlur={() => setIsFieldActive(false)}
             onFocus={() => setIsFieldActive(true)}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
-          <TealButton
-            text="Login"
-            onPress={() => navigation.navigate("Main")}
-          />
+
+          <Text
+            style={{ color: colors.danger }}
+            visible={errors.password != ""}
+          >
+            {errors.password}
+          </Text>
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <TealButton
+              text="Login"
+              onPress={() => {
+                checkValidation();
+                if (errors.email == "" && errors.password == "") {
+                  setIsLoading(true);
+                  handleSignIn(email, password)
+                    .then(() => {
+                      setIsLoading(false);
+                      navigation.navigate("Main");
+                    })
+                    .catch((ex) => {
+                      setIsLoading(false);
+                      toast.show("Failed to sign in. Try again", {
+                        type: "danger",
+                        style: { height: 50 },
+                      });
+                      console.log(ex);
+                    });
+                }
+              }}
+            />
+          )}
           <ColoredText
             color={colors.teal100}
             underLine
             style={{ fontSize: 16 }}
-            onPress={() => null}
+            onPress={() => navigation.navigate("ForgotPassword")}
           >
             Forgot your password?
           </ColoredText>

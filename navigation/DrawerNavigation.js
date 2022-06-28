@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 
 import {
   createDrawerNavigator,
@@ -17,10 +17,14 @@ import {
 } from "../screens";
 import { colors } from "../utilities/colors";
 import { DashboardNavigaiton } from "./DashboardNavigation";
+import { useUser } from "../hooks/useContext";
+import { getAuth } from "firebase/auth";
 
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
+  const { setIsLogin, notifications } = useUser();
+  const auth = getAuth();
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
@@ -49,9 +53,24 @@ function CustomDrawerContent(props) {
           />
 
           <DrawerItem
-            icon={({ color, focused, size }) => (
-              <AntDesign name="bells" size={size} color={colors.teal100} />
-            )}
+            icon={({ color, focused, size }) =>
+              notifications.length > 0 ? (
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    backgroundColor: colors.danger,
+                    borderRadius: 12,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "white" }}>{notifications.length}</Text>
+                </View>
+              ) : (
+                <AntDesign name="bells" size={size} color={colors.teal100} />
+              )
+            }
             label="Notification"
             onPress={() => {
               props.navigation.navigate("Notification");
@@ -90,7 +109,9 @@ function CustomDrawerContent(props) {
             )}
             label="Logout"
             onPress={() => {
-              props.navigation.navigate("SignIn");
+              auth.signOut();
+              setIsLogin(false);
+              // props.navigation.navigate("SignIn");
             }}
           />
         </PaperDrawer.Section>

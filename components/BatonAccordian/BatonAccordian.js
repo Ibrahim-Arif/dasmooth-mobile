@@ -22,7 +22,7 @@ export default function BatonAccordian({
     <View style={{ backgroundColor: bgColor }}>
       <List.Accordion
         onLongPress={drag}
-        title={title}
+        title={`${title} (${listItems.length})`}
         right={() => (
           <FontAwesome name="bars" size={20} color="black" onLongPress={drag} />
         )}
@@ -45,10 +45,10 @@ export default function BatonAccordian({
         ]}
         onPress={() => setPressed(!pressed)}
       >
-        {dummy.map((e, index) => (
+        {listItems.map((e, index) => (
           <List.Item
             key={index}
-            title={e}
+            title={e.title}
             style={[
               styles.listItem,
               { borderLeftColor: color },

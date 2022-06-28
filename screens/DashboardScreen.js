@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   View,
@@ -18,52 +18,116 @@ import DraggableFlatList, {
 import { BatonAccordian, TealButton } from "../components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
+import { useUser } from "../hooks/useContext";
+import { filterBatonsData } from "../utilities/filterBatonsData";
+import { batonsList } from "../utilities/batonsList";
 
 export default function DashboardScreen({ navigation }) {
-  const [batons, setBatons] = useState([
-    {
-      title: "Pending Batons",
-      borderColor: null,
-      bgColor: null,
-    },
-    {
-      title: "Passed Batons",
-      borderColor: "#EFB029",
-      bgColor: "#FDF7E6",
-    },
-    {
-      title: "Received Batons",
-      borderColor: "#8217B1",
-      bgColor: "#F7EFFD",
-    },
-    {
-      title: "Accepted Batons",
-      borderColor: "#409000",
-      bgColor: "#F4FDF2",
-    },
-    {
-      title: "Complete Batons",
-      borderColor: "#196DB2",
-      bgColor: "#F2F8FB",
-    },
-    {
-      title: "Declined Batons",
-      borderColor: "#EA4400",
-      bgColor: "#FDEEE7",
-    },
-  ]);
+  const {
+    batonsData,
+    batons,
+    setBatons,
+    isLogin,
+    setBatonsData,
+    permanentData,
+  } = useUser();
+
   const [isSearchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [PendingBatons, setPendingBatons] = useState([]);
+  const [PassedBatons, setPassedBatons] = useState([]);
+  const [ReceivedBatons, setReceivedBatons] = useState([]);
+  const [DeclinedBatons, setDeclinedBatons] = useState([]);
+  const [AcceptedBatons, setAcceptedBatons] = useState([]);
+  const [CompleteBatons, setCompleteBatons] = useState([]);
+  const [activeBatons, setActiveBatons] = useState(Object.values(batons));
+
+  const statuses = ["pending", "passed", "received", "declined", "complete"];
+
+  const filterBatons = (batonData, batonName) => {
+    // console.log(batonsList)
+    if (batonData.length == 0) {
+      // console.log(`removing the ${batonName} btaon back in array`);
+      let temp = batons;
+      delete temp[batonName];
+      setBatons(temp);
+      setActiveBatons(Object.values(temp));
+    } else if (batonData.length > 0) {
+      // console.log(`adding the ${batonName} btaon back in array`);
+      let temp = batons;
+      temp[batonName] = batonsList[batonName];
+      // console.log(batonsList)
+      setBatons(temp);
+      temp = Object.values(temp);
+      setActiveBatons(Object.values(temp));
+    }
+  };
+
+  useEffect(() => {
+    console.log("DashBoardView");
+    // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
+    // console.log(batonsData);
+    let pending = filterBatonsData(batonsData, "pending", isLogin.uid);
+    filterBatons(pending, "pending");
+    setPendingBatons(pending);
+
+    let passed = filterBatonsData(batonsData, "passed", isLogin.uid);
+    filterBatons(passed, "passed");
+    setPassedBatons(passed);
+
+    let received = filterBatonsData(batonsData, "received", isLogin.uid);
+    filterBatons(received, "received");
+    setReceivedBatons(received);
+
+    let accepted = filterBatonsData(batonsData, "accepted", isLogin.uid);
+    filterBatons(accepted, "accepted");
+    setDeclinedBatons(accepted);
+
+    let declined = filterBatonsData(batonsData, "declined", isLogin.uid);
+    filterBatons(declined, "declined");
+    setDeclinedBatons(declined);
+
+    let complete = filterBatonsData(batonsData, "complete");
+    // console.log("coomp", complete);
+    filterBatons(complete, "complete");
+    setCompleteBatons(complete);
+
+    // console.log(batons);
+  }, [batonsData]);
+
+  const getBaton = {
+    PendingBatons,
+    PassedBatons,
+    ReceivedBatons,
+    DeclinedBatons,
+    AcceptedBatons,
+    CompleteBatons,
+  };
   const onChangeSearch = (query) => setSearchQuery(query);
 
-  const renderItem = ({ item, drag, isActive }) => (
+  useEffect(() => {
+    if (searchQuery == "") {
+      setBatonsData(permanentData);
+    } else {
+      let temp = [...permanentData];
+      temp = temp.filter(
+        (e) =>
+          e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          e.memberName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setBatonsData(temp);
+    }
+  }, [searchQuery]);
+
+  const renderItem = ({ item, drag, isActive }, data) => (
     <ScaleDecorator>
       <View style={{ marginTop: 15 }}>
         <BatonAccordian
-          title={`${item.title} (0)`}
+          title={item.title}
           bgColor={item.bgColor}
           color={item.borderColor}
           drag={drag}
+          listItems={data}
         />
       </View>
     </ScaleDecorator>
@@ -125,10 +189,15 @@ export default function DashboardScreen({ navigation }) {
           <DraggableFlatList
             showsVerticalScrollIndicator={false}
             ListFooterComponent={<View style={{ height: 100 }}></View>}
-            data={batons}
+            data={activeBatons}
             onDragEnd={({ data }) => setBatons(data)}
             keyExtractor={(item) => item.title}
-            renderItem={renderItem}
+            renderItem={({ item, drag, isActive }) =>
+              renderItem(
+                { item, drag, isActive },
+                getBaton[item.title.replace(/\s+/g, "")]
+              )
+            }
           />
         </View>
       </>

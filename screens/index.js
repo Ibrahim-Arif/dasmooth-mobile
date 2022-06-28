@@ -12,8 +12,12 @@ import DateTimeFormScreen from "./DateTimeFormScreen";
 import BudgetFormScreen from "./BudgetFormScreen";
 import FileFormScreen from "./FileFormScreen";
 import PostUpdateFormScreen from "./PostUpdateFormScreen";
+import ForgotPasswordScreen from "./ForgotPasswordScreen";
+import VerifyEmailScreen from "./VerifyEmailScreen";
 
 export {
+  VerifyEmailScreen,
+  ForgotPasswordScreen,
   PostUpdateFormScreen,
   FileFormScreen,
   BudgetFormScreen,
