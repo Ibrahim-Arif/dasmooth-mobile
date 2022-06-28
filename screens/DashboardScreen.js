@@ -208,7 +208,7 @@ export default function DashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: Platform.OS === "android" ? 24 : 0,
+    // marginTop: Platform.OS === "android" ? 24 : 0,
   },
   modalTitleContainer: {
     height: 50,

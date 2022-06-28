@@ -5,14 +5,7 @@ import { Avatar, IconButton, TextInput } from "react-native-paper";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 
-import {
-  BudgetComponent,
-  DateTimeComponent,
-  FileAttachmentComponent,
-  MemberSelectionComponent,
-  PostUpdateComponent,
-  Selectable,
-} from "../components";
+import { Selectable } from "../components";
 import { colors } from "../utilities/colors";
 
 export default function DashboardScreen({ navigation }) {

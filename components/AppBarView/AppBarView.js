@@ -21,5 +21,8 @@ export default function AppBarView({ navigation, children }) {
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: Platform.OS === "android" ? 24 : 0 },
+  container: {
+    flex: 1,
+    // marginTop: Platform.OS === "android" ? 24 : 0
+  },
 });
