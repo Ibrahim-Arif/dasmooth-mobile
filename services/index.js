@@ -3,6 +3,7 @@ import { handleAddBatonFiles } from "./handleAddBatonFiles";
 import { handleAddPostUpdate } from "./handleAddPostUpdate";
 import { handleAddSystemUserToMember } from "./handleAddSystemUserToMemeber";
 import { handleAddTeamMember } from "./handleAddTeamMember";
+import { handleAddTeamMemberByInvite } from "./handleAddTeamMemberByInvite";
 import { handleDeleteBaton } from "./handleDeleteBaton";
 import { handleDeleteTeamMember } from "./handleDeleteTeamMember";
 import { handleForgotPassword } from "./handleForgotPassword";
@@ -18,7 +19,9 @@ import { handleUpdateNotificationStatus } from "./handleUpdateNotificationStatus
 import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
+
 export {
+  handleAddTeamMemberByInvite,
   handleUpdateBaton,
   handleAddSystemUserToMember,
   handleUpdateTeamMemberStatus,

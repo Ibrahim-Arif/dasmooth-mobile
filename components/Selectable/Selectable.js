@@ -24,6 +24,8 @@ export default function Selectable({
         color: isActive ? "white" : "black",
         justifyContent: "flex-start",
         marginVertical: 5,
+        borderColor: "#D9D9D9",
+        borderWidth: 0.5,
         ...style,
       }}
       contentStyle={{

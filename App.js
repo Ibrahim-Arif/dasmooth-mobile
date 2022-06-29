@@ -16,6 +16,8 @@ import {
   handleGetOtherBatons,
   handleGetTeamMembers,
 } from "./services";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -41,6 +43,7 @@ export default function App() {
   const [myBatons, setMyBatons] = useState([]);
   const [otherBatons, setOtherBatons] = useState([]);
 
+  const auth = getAuth();
   const userContextValues = {
     isLogin,
     setIsLogin,
@@ -57,7 +60,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log(isLogin);
+    // console.log(isLogin);
     if (isLogin) {
       handleGetTeamMembers(isLogin.uid, setTeamMembers);
       handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
@@ -87,12 +90,18 @@ export default function App() {
     }, []);
 
     setPermanentData(filteredArr);
-    console.log("Permanent:", permanentData);
+    // console.log("Permanent:", permanentData);
   }, [myBatons, otherBatons]);
 
   useEffect(() => {
     setBatonsData([...permanentData]);
   }, [permanentData]);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.emailVerified) {
+      setIsLogin(user);
+    }
+  });
   return (
     <StateProvider values={userContextValues}>
       <PaperProvider theme={theme}>
@@ -107,13 +116,13 @@ export default function App() {
           warningColor="white"
           normalColor="gray"
           successIcon={
-            <AntDesign name="infocirlceo" size={20} color={colors.danger} />
+            <AntDesign name="infocirlceo" size={20} color={colors.success} />
           }
           dangerIcon={
-            <AntDesign name="infocirlceo" size={20} color={colors.warning} />
+            <AntDesign name="infocirlceo" size={20} color={colors.danger} />
           }
           warningIcon={
-            <AntDesign name="infocirlceo" size={20} color={colors.success} />
+            <AntDesign name="infocirlceo" size={20} color={colors.warning} />
           }
           textStyle={{ fontSize: 13, color: "black" }}
           offset={50} // offset for both top and bottom toasts
