@@ -42,20 +42,20 @@ export default function MemberSelectionComponent({
   const toast = useToast();
 
   useEffect(() => {
-    return () => {
-      let data = members;
+    // return () => {
+    let data = members;
 
-      if (searchText == "") {
-        setMembersList(data);
-      } else {
-        data = members.filter(
-          (e) =>
-            e.receiverEmail.toLowerCase().includes(searchText.toLowerCase()) ||
-            e.name.toLowerCase().includes(searchText.toLowerCase())
-        );
-        setMembersList(data);
-      }
-    };
+    if (searchText == "") {
+      setMembersList(data);
+    } else {
+      data = members.filter(
+        (e) =>
+          e.receiverEmail.toLowerCase().includes(searchText.toLowerCase()) ||
+          e.name.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setMembersList(data);
+    }
+    // };
   }, [members, searchText]);
 
   const handleDeleteUser = () => {
