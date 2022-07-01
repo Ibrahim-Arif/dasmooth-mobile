@@ -23,7 +23,7 @@ import { getAuth } from "firebase/auth";
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
-  const { setIsLogin, notifications } = useUser();
+  const { setIsLogin, notifications, isLogin } = useUser();
   const auth = getAuth();
   return (
     <DrawerContentScrollView {...props}>
@@ -31,7 +31,7 @@ function CustomDrawerContent(props) {
         <View style={styles.userInfoSection}>
           <Avatar.Image
             source={{
-              uri: "https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg",
+              uri: isLogin.photoURL,
             }}
             size={80}
           />
