@@ -4,7 +4,7 @@ export const handleForgotPassword = async (email) => {
   try {
     const auth = getAuth();
     await sendPasswordResetEmail(auth, email);
-    console.log("here");
+    // console.log("here");
   } catch (ex) {
     throw new Error(ex);
   }

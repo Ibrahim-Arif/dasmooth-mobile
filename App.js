@@ -102,6 +102,7 @@ export default function App() {
       setIsLogin(user);
     }
   });
+
   return (
     <StateProvider values={userContextValues}>
       <PaperProvider theme={theme}>

@@ -6,7 +6,7 @@ export const useCheckSignIn = () => {
   const { isLogin, setIsLogin } = useUser();
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(isLogin);
+    // console.log(isLogin);
     if (isLogin.uid == null || isLogin.uid == undefined) {
       setIsLogin(false);
       navigate("/signin");

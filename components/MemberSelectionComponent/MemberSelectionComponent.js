@@ -10,7 +10,7 @@ import {
 import { Avatar, Button, TextInput } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
-import { widths } from "../../utilities/sizes";
+import { heights, widths } from "../../utilities/sizes";
 import {
   handleAddSystemUserToMember,
   handleSignUp,
@@ -242,7 +242,13 @@ export default function MemberSelectionComponent({
       </Selectable>
 
       {/* Members List */}
-      <ScrollView style={{ marginTop: 5 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={{
+          marginTop: 5,
+          height: formMode ? heights.height45p : heights.height55p,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         {membersList.map((e, index) => (
           <Selectable
             key={index}
@@ -296,19 +302,19 @@ export default function MemberSelectionComponent({
             {e.name}
           </Selectable>
         ))}
-        {formMode && (
-          <View style={{ marginTop: 15 }}>
-            <TealButton
-              text="SELECT MEMBER"
-              onPress={() => {
-                if (member.text != "") setSelectedItem(member);
-                closeScreen();
-              }}
-            />
-          </View>
-        )}
-        <View style={{ height: formMode ? 150 : 250 }}></View>
       </ScrollView>
+      {/* <View style={{ height: formMode ? 150 : 250 }}></View> */}
+      {formMode && (
+        <View style={{ marginTop: 15 }}>
+          <TealButton
+            text="SELECT MEMBER"
+            onPress={() => {
+              if (member.text != "") setSelectedItem(member);
+              closeScreen();
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 }

@@ -30,6 +30,7 @@
     "react-native-collapsible": "^1.6.0",
     "react-native-draggable-flatlist": "^3.1.1",
     "react-native-gesture-handler": "~2.2.1",
+    "react-native-get-random-values": "^1.8.0",
     "react-native-modal": "^13.0.1",
     "react-native-modal-datetime-picker": "^13.1.2",
     "react-native-paper": "^4.12.1",
@@ -38,10 +39,13 @@
     "react-native-screens": "~3.11.1",
     "react-native-sortable-list": "^0.0.25",
     "react-native-toast-notifications": "^3.3.0",
-    "react-native-web": "0.17.7"
+    "react-native-web": "0.17.7",
+    "rn-fetch-blob": "^0.12.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "get-current-line": "^6.6.0"
   },
   "private": true
 }

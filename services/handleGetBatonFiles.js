@@ -15,7 +15,7 @@ import {
         querySnapshot.forEach((doc) => {
           tempData.push({ ...doc.data() });
         });
-        console.log(tempData);
+        // console.log(tempData);
         setData(tempData);
       });
     } catch (ex) {

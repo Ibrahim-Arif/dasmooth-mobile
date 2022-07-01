@@ -128,6 +128,7 @@ export default function DashboardScreen({ navigation }) {
           color={item.borderColor}
           drag={drag}
           listItems={data}
+          navigation={navigation}
         />
       </View>
     </ScaleDecorator>
@@ -181,7 +182,7 @@ export default function DashboardScreen({ navigation }) {
               icon={() => <Entypo name="plus" size={24} color="white" />}
               style={{ width: 220, backgroundColor: colors.tealDark30 }}
               onPress={() => {
-                navigation.navigate("BatonForm");
+                navigation.navigate("BatonForm", { batonId: null });
               }}
             />
           </View>

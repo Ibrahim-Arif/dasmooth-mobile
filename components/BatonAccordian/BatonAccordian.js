@@ -11,6 +11,7 @@ export default function BatonAccordian({
   color = "grey",
   bgColor = "white",
   drag,
+  navigation,
 }) {
   // const [expanded, setExpanded] = React.useState(true);
   // const handlePress = () => setExpanded(!expanded);
@@ -65,7 +66,9 @@ export default function BatonAccordian({
             )}
             // onPressIn={() => setPressed(true)}
             // onPressOut={() => setPressed(false)}
-            onPress={onPress}
+            onPress={() => {
+              navigation.navigate("BatonForm", { batonId: e.docId });
+            }}
           />
         ))}
       </List.Accordion>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableNativeFeedback, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import ColoredText from "../ColoredText/ColoredText";
@@ -7,58 +7,129 @@ import Selectable from "../Selectable/Selectable";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 import { ScrollView } from "react-native-gesture-handler";
+import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
+import { ActivityIndicator } from "react-native-paper";
+import { heights } from "../../utilities/sizes";
+import { useToast } from "react-native-toast-notifications";
 
 export default function FileAttachmentComponent({
   selectedItem,
   setSelectedItem,
   closeScreen,
+  batonId,
 }) {
-  const [files, setFiles] = useState(selectedItem);
+  const [imageData, setImageData] = useState({ filesList: [] });
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const toast = useToast();
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
+      base64: true,
     });
-
-    console.log(result);
-    const items = [...files];
+    // console.log("\n\n\nRESULT:'");
+    // console.log(result);
+    const items = [...imageData.filesList];
     if (!result.cancelled) {
       let fileName = "";
       fileName = result.uri.split("/").slice(-1)[0];
       result.fileName = fileName;
       items.push(result);
-      setFiles(items);
-      console.log(items);
+      setImageData({ ...imageData, filesList: items });
+      // console.log(items);
     }
   };
+
   const handleRemoveFile = (index) => {
-    let temp = files;
+    let temp = imageData.filesList;
     delete temp[index];
 
-    setFiles(temp.filter((e) => e != undefined));
+    setImageData({
+      ...imageData,
+      filesList: temp.filter((e) => e != undefined),
+    });
   };
+
+  const handleUpload = () => {
+    if (batonId == null) {
+      toast.show("Baton Id is null", { type: "danger" });
+      return;
+    }
+    setUploading(true);
+    for (let i = 0; i < imageData.filesList.length; i++) {
+      // var reader = new FileReader();
+
+      let imagesData = {
+        image: imageData.filesList[i].base64,
+        batonId: batonId,
+        fileName: imageData.filesList[i].fileName,
+      };
+
+      handleAddBatonFiles(imagesData)
+        .then(() => {
+          // generateNotification("success", "Images uploaded successfully");
+          toast.show("Images uploaded successfully", { type: "success" });
+          setUploading(false);
+          closeScreen();
+          // clickOk();
+        })
+        .catch((ex) => {
+          toast.show("Error uploading images", { type: "danger" });
+          // generateNotification("error", "Failed to upload files!");
+          setUploading(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      // console.log(imageData);
+      // if imagedata or uploadedfiles is empty, then it means that the user has not uploaded any files
+      if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
+        setSelectedItem({
+          filesList: [...imageData.filesList, ...uploadedFiles],
+          text: "Attach a file (Optional)",
+        });
+      // else there are some files which we want to send to the baton form screen
+      // so that we can show the files length in the baton form screen
+      else
+        setSelectedItem({
+          filesList: [...imageData.filesList, ...uploadedFiles],
+          text: `${
+            uploadedFiles.length + imageData.filesList.length
+          } files attached`,
+        });
+    };
+  }, [imageData, uploadedFiles]);
+
+  useEffect(() => {
+    // console.log(batonId);
+    // fetching the baton files from firebase
+    handleGetBatonFiles(batonId, setUploadedFiles);
+  }, []);
 
   return (
     <View style={{ padding: 20 }}>
       {/* Drag and Drop Container */}
+
+      <TouchableNativeFeedback onPress={pickImage}>
+        <View style={styles.dragDropContainer}>
+          <AntDesign name="inbox" size={45} color={colors.teal100} />
+          <ColoredText>Drag and drop here</ColoredText>
+          <ColoredText>or</ColoredText>
+          <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
+        </View>
+      </TouchableNativeFeedback>
       <ScrollView
-        showsVerticalScrollIndicator={false}
         bounces={false}
+        style={{ height: heights.height20p }}
         // endFillColor={colors.tealLight90}
       >
-        <TouchableNativeFeedback onPress={pickImage}>
-          <View style={styles.dragDropContainer}>
-            <AntDesign name="inbox" size={45} color={colors.teal100} />
-            <ColoredText>Drag and drop here</ColoredText>
-            <ColoredText>or</ColoredText>
-            <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
-          </View>
-        </TouchableNativeFeedback>
-
         <View style={{ marginTop: 15 }}>
-          {files &&
-            files.map((e, index) => (
+          {imageData.filesList &&
+            imageData.filesList.map((e, index) => (
               <Selectable
                 key={index}
                 isActive={false}
@@ -74,23 +145,43 @@ export default function FileAttachmentComponent({
               </Selectable>
             ))}
         </View>
+        <View style={{ marginTop: 15 }}>
+          {uploadedFiles.map((e, index) => (
+            <Selectable
+              key={index}
+              isActive={false}
+              bgColor={colors.tealLight95}
+              // onPress={() => handleRemoveFile(index)}
+              icon={
+                <AntDesign name="download" size={12} color={colors.teal100} />
+              }
+              style={{ height: 35 }}
+              contentStyle={{ height: 35 }}
+            >
+              {e.fileName}
+            </Selectable>
+          ))}
+        </View>
+      </ScrollView>
 
-        <ColoredText color="teal" style={styles.attachFileText}>
-          {files.length} files attached
-        </ColoredText>
-
-        <View style={styles.tealButtonContainer}>
+      <ColoredText color="teal" style={styles.attachFileText}>
+        {imageData.filesList.length + uploadedFiles.length} files attached
+      </ColoredText>
+      <View style={styles.tealButtonContainer}>
+        {uploading ? (
+          <ActivityIndicator />
+        ) : (
           <TealButton
             text="Upload"
             style={{ width: 285 }}
-            onPress={() => {
-              setSelectedItem(files);
-              closeScreen();
-            }}
+            onPress={
+              handleUpload
+              // setSelectedItem(imageData);
+            }
           />
-        </View>
-        <View style={{ height: 50 }}></View>
-      </ScrollView>
+        )}
+      </View>
+      <View style={{ height: 50 }}></View>
     </View>
   );
 }

@@ -37,18 +37,18 @@ export default function SignInScreen({ navigation }) {
     },
   };
   useEffect(() => {
-    return () => {
-      if (email != "") {
-        if (!email.includes("@")) {
-          setErrors({ ...errors, email: "Enter a valid email address" });
-        } else {
-          setErrors({ ...errors, email: "" });
-        }
+    // return () => {
+    if (email != "") {
+      if (!email.includes("@")) {
+        setErrors({ ...errors, email: "Enter a valid email address" });
+      } else {
+        setErrors({ ...errors, email: "" });
       }
-      if (password != "") {
-        setErrors({ ...errors, password: "" });
-      }
-    };
+    }
+    if (password != "") {
+      setErrors({ ...errors, password: "" });
+    }
+    // };
   }, [email, password]);
 
   const checkValidation = () => {
