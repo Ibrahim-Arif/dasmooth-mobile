@@ -1,4 +1,4 @@
-import React, { isValidElement, useEffect } from "react";
+import React, { isValidElement, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,9 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { DefaultTheme, TextInput, HelperText } from "react-native-paper";
+import { DefaultTheme, TextInput } from "react-native-paper";
+import { Formik } from "formik";
+import * as yup from "yup";
 import { logo } from "../assets";
 
 import { ColoredText, TealButton } from "../components";
@@ -17,12 +19,15 @@ import { heights, widths } from "../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
 
 export default function SignInScreen({ navigation }) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [isFieldActive, setIsFieldActive] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [errors, setErrors] = React.useState({ email: "", password: "" });
+  const [isFieldActive, setIsFieldActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const toast = useToast();
+
+  let schema = yup.object().shape({
+    email: yup.string().email().required().label("Email"),
+    password: yup.string().required().min(6).label("Password"),
+  });
 
   let inputTheme = {
     ...DefaultTheme,
@@ -36,33 +41,24 @@ export default function SignInScreen({ navigation }) {
       placeholder: isFieldActive ? "black" : "white",
     },
   };
-  useEffect(() => {
-    // return () => {
-    if (email != "") {
-      if (!email.includes("@")) {
-        setErrors({ ...errors, email: "Enter a valid email address" });
-      } else {
-        setErrors({ ...errors, email: "" });
-      }
-    }
-    if (password != "") {
-      setErrors({ ...errors, password: "" });
-    }
-    // };
-  }, [email, password]);
 
-  const checkValidation = () => {
-    if (email == "") {
-      setErrors({ ...errors, email: "Enter a email" });
-    } else {
-      setErrors({ ...errors, email: "" });
-    }
+  // };
 
-    // if (password == "") {
-    //   setErrors({ ...errors, password: "Enter a password" });
-    // } else {
-    //   setErrors({ ...errors, password: "" });
-    // }
+  const handleLoginClick = (email, password) => {
+    setIsLoading(true);
+    handleSignIn(email, password)
+      .then(() => {
+        setIsLoading(false);
+        navigation.navigate("Main");
+      })
+      .catch((ex) => {
+        setIsLoading(false);
+        toast.show(ex.message, {
+          type: "danger",
+          // style: { padding: 70 },
+        });
+        // console.log(ex);
+      });
   };
   return (
     <View style={styles.container}>
@@ -93,98 +89,82 @@ export default function SignInScreen({ navigation }) {
         >
           <Text style={styles.welcomeBackText}>Welcome Back</Text>
         </View>
-        <View
-          style={[
-            // styles.flexContainer,
-            {
-              height: 350, // backgroundColor: "tomato",
-              justifyContent: "space-around",
-              alignItems: "center",
-              marginTop: 50,
-            },
-          ]}
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          onSubmit={(values) => handleLoginClick(values.email, values.password)}
+          validationSchema={schema}
         >
-          <TextInput
-            label="Email"
-            // right={<TextInput.Icon name="email" />}
-            style={[{ height: 60, width: 300 }]}
-            theme={inputTheme}
-            onBlur={() => setIsFieldActive(false)}
-            onFocus={() => setIsFieldActive(true)}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-
-          <Text style={{ color: colors.danger }} visible={errors.email != ""}>
-            {errors.email}
-          </Text>
-
-          <TextInput
-            label="Password"
-            secureTextEntry
-            // right={<TextInput.Icon name="eye" />}
-            style={{ height: 60, width: 300 }}
-            theme={inputTheme}
-            onBlur={() => setIsFieldActive(false)}
-            onFocus={() => setIsFieldActive(true)}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
-
-          <Text
-            style={{ color: colors.danger }}
-            visible={errors.password != ""}
-          >
-            {errors.password}
-          </Text>
-          {isLoading ? (
-            <ActivityIndicator />
-          ) : (
-            <TealButton
-              text="Login"
-              onPress={() => {
-                checkValidation();
-                if (errors.email == "" && errors.password == "") {
-                  setIsLoading(true);
-                  handleSignIn(email, password)
-                    .then(() => {
-                      setIsLoading(false);
-                      navigation.navigate("Main");
-                    })
-                    .catch((ex) => {
-                      setIsLoading(false);
-                      toast.show("Failed to sign in. Try again", {
-                        type: "danger",
-                        style: { height: 50 },
-                      });
-                      console.log(ex);
-                    });
-                }
-              }}
-            />
-          )}
-          <ColoredText
-            color={colors.teal100}
-            underLine
-            style={{ fontSize: 16 }}
-            onPress={() => navigation.navigate("ForgotPassword")}
-          >
-            Forgot your password?
-          </ColoredText>
-          <View style={styles.textContainer}>
-            <ColoredText color="white" style={{ fontSize: 16 }}>
-              Don't have an account?
-            </ColoredText>
-            <ColoredText
-              color={colors.teal100}
-              underLine
-              style={{ fontSize: 16 }}
-              onPress={() => navigation.navigate("SignUp")}
+          {({ handleChange, handleSubmit, values, errors }) => (
+            <View
+              style={[
+                // styles.flexContainer,
+                {
+                  height: 350, // backgroundColor: "tomato",
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  marginTop: 50,
+                },
+              ]}
             >
-              Sign Up
-            </ColoredText>
-          </View>
-        </View>
+              <TextInput
+                label="Email"
+                // right={<TextInput.Icon name="email" />}
+                style={[{ height: 60, width: 300 }]}
+                theme={inputTheme}
+                onBlur={() => setIsFieldActive(false)}
+                onFocus={() => setIsFieldActive(true)}
+                value={values.email}
+                onChangeText={handleChange("email")}
+              />
+
+              <Text style={{ color: colors.danger }} visible={errors.email}>
+                {errors.email}
+              </Text>
+
+              <TextInput
+                label="Password"
+                secureTextEntry
+                // right={<TextInput.Icon name="eye" />}
+                style={{ height: 60, width: 300 }}
+                theme={inputTheme}
+                onBlur={() => setIsFieldActive(false)}
+                onFocus={() => setIsFieldActive(true)}
+                value={values.password}
+                onChangeText={handleChange("password")}
+              />
+
+              <Text style={{ color: colors.danger }} visible={errors.password}>
+                {errors.password}
+              </Text>
+              {isLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <TealButton text="Login" onPress={handleSubmit} />
+              )}
+              <ColoredText
+                color={colors.teal100}
+                underLine
+                style={{ fontSize: 16 }}
+                onPress={() => navigation.navigate("ForgotPassword")}
+              >
+                Forgot your password?
+              </ColoredText>
+              <View style={styles.textContainer}>
+                <ColoredText color="white" style={{ fontSize: 16 }}>
+                  Don't have an account?
+                </ColoredText>
+                <ColoredText
+                  color={colors.teal100}
+                  underLine
+                  style={{ fontSize: 16 }}
+                  onPress={() => navigation.navigate("SignUp")}
+                >
+                  Sign Up
+                </ColoredText>
+              </View>
+            </View>
+          )}
+        </Formik>
       </ScrollView>
     </View>
   );

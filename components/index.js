@@ -7,11 +7,13 @@ import FileAttachmentComponent from "./FileAttachmentComponent/FileAttachmentCom
 import FormScreen from "./FormScreen/FormScreen";
 import Loading from "./Loading/Loading";
 import MemberSelectionComponent from "./MemberSelectionComponent/MemberSelectionComponent";
+import NotificationBox from "./NotificationBox/NotificationBox";
 import PostUpdateComponent from "./PostUpdateComponent/PostUpdateComponent";
 import Selectable from "./Selectable/Selectable";
 import TealButton from "./TealButton/TealButton";
 
 export {
+  NotificationBox,
   Loading,
   FormScreen,
   AppBarView,

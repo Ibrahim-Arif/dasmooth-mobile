@@ -1,16 +1,28 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { DefaultTheme, TextInput } from "react-native-paper";
+import { useToast } from "react-native-toast-notifications";
+import { Formik } from "formik";
+import * as yup from "yup";
 
 import { ColoredText, TealButton } from "../components";
 import { logo } from "../assets";
 import { colors } from "../utilities/colors";
 import { heights, widths } from "../utilities/sizes";
+import { handleSignUp } from "../services";
 
 export default function SignUpScreen({ navigation }) {
-  const [text, setText] = React.useState("");
-  const [isFieldActive, setIsFieldActive] = React.useState(false);
+  const [isFieldActive, setIsFieldActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const toast = useToast();
   let inputTheme = {
     ...DefaultTheme,
     roundness: 2,
@@ -22,6 +34,27 @@ export default function SignUpScreen({ navigation }) {
       background: isFieldActive ? "white" : "transparent",
       placeholder: isFieldActive ? "black" : "white",
     },
+  };
+
+  let schema = yup.object().shape({
+    email: yup.string().email().required().label("Email"),
+    password: yup.string().required().min(6).label("Password"),
+  });
+
+  const handleSignUpClick = (email, password) => {
+    setLoading(true);
+    handleSignUp(email, password)
+      .then((user) => {
+        setLoading(false);
+        navigation.navigate("VerifyEmail");
+      })
+      .catch((ex) => {
+        toast.show("Error signing up", {
+          type: "danger",
+          style: { height: 50 },
+        });
+        setLoading(false);
+      });
   };
 
   return (
@@ -47,58 +80,70 @@ export default function SignUpScreen({ navigation }) {
             styles.flexContainer,
             {
               height: 50,
-              // backgroundColor: "tomato",
             },
           ]}
         >
           <Text style={styles.welcomeBackText}>Welcome Back</Text>
         </View>
-        <View
-          style={[
-            // styles.flexContainer,
-            {
-              height: 350, // backgroundColor: "tomato",
-              justifyContent: "space-around",
-              alignItems: "center",
-              marginTop: 50,
-            },
-          ]}
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          onSubmit={(values) =>
+            handleSignUpClick(values.email, values.password)
+          }
+          validationSchema={schema}
         >
-          <TextInput
-            label="Email"
-            // right={<TextInput.Icon name="email" />}
-            style={[{ height: 60, width: 300 }]}
-            theme={inputTheme}
-            onBlur={() => setIsFieldActive(false)}
-            onFocus={() => setIsFieldActive(true)}
-          />
-          <TextInput
-            label="Password"
-            secureTextEntry
-            // right={<TextInput.Icon name="eye" />}
-            style={{ height: 60, width: 300 }}
-            theme={inputTheme}
-            onBlur={() => setIsFieldActive(false)}
-            onFocus={() => setIsFieldActive(true)}
-          />
-          <TealButton
-            text="SignUp"
-            onPress={() => navigation.navigate("Main")}
-          />
-          <View style={styles.textContainer}>
-            <ColoredText color="white" style={{ fontSize: 16 }}>
-              Already have an account?
-            </ColoredText>
-            <ColoredText
-              color={colors.teal100}
-              underLine
-              style={{ fontSize: 16 }}
-              onPress={() => navigation.navigate("SignIn")}
-            >
-              Login
-            </ColoredText>
-          </View>
-        </View>
+          {({ handleChange, handleSubmit, values, errors }) => (
+            <View style={styles.formContainer}>
+              <TextInput
+                label="Email"
+                style={styles.textInput}
+                theme={inputTheme}
+                onBlur={() => setIsFieldActive(false)}
+                onFocus={() => setIsFieldActive(true)}
+                value={values.email}
+                onChangeText={handleChange("email")}
+              />
+
+              <Text style={{ color: colors.danger }} visible={errors.email}>
+                {errors.email}
+              </Text>
+
+              <TextInput
+                label="Password"
+                secureTextEntry
+                style={styles.textInput}
+                theme={inputTheme}
+                onBlur={() => setIsFieldActive(false)}
+                onFocus={() => setIsFieldActive(true)}
+                value={values.password}
+                onChangeText={handleChange("password")}
+              />
+              <Text style={{ color: colors.danger }} visible={errors.password}>
+                {errors.password}
+              </Text>
+
+              {loading ? (
+                <ActivityIndicator />
+              ) : (
+                <TealButton text="SignUp" onPress={handleSubmit} />
+              )}
+
+              <View style={styles.textContainer}>
+                <ColoredText color="white" style={{ fontSize: 16 }}>
+                  Already have an account?
+                </ColoredText>
+                <ColoredText
+                  color={colors.teal100}
+                  underLine
+                  style={{ fontSize: 16 }}
+                  onPress={() => navigation.navigate("SignIn")}
+                >
+                  Login
+                </ColoredText>
+              </View>
+            </View>
+          )}
+        </Formik>
       </ScrollView>
     </View>
   );
@@ -140,4 +185,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  formContainer: {
+    height: 350,
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  textInput: { height: 60, width: 300 },
 });

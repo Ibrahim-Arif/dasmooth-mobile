@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView } from "react-native-gesture-handler";
-import { View, Text, StyleSheet, Platform, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView, Alert } from "react-native";
 import {
   ActivityIndicator,
   Avatar,
   IconButton,
+  Menu,
   TextInput,
 } from "react-native-paper";
-import { FontAwesome, AntDesign } from "@expo/vector-icons";
+import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
+import { useToast } from "react-native-toast-notifications";
 import { v4 } from "uuid";
+import moment from "moment";
 import "react-native-get-random-values";
 
-import { Selectable } from "../components";
+import { Selectable, TealButton, NotificationBox } from "../components";
 import { colors } from "../utilities/colors";
 import { useUser } from "../hooks/useContext";
-import { handleGetBatonFiles } from "../services";
+import {
+  handleAddBaton,
+  handleDeleteBaton,
+  handleGetBatonFiles,
+  handleUpdateBaton,
+} from "../services";
+import logResponse from "../utilities/logger";
 
 export default function DashboardScreen({ route, navigation }) {
   const { batonId } = route.params;
   const { batonsData, isLogin } = useUser();
+  const toast = useToast();
 
   const [mode, setMode] = useState(0);
   const [activeTitle, setActiveTitle] = useState("Dummy Title");
@@ -36,6 +46,7 @@ export default function DashboardScreen({ route, navigation }) {
     ),
   });
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [dateData, setDateData] = useState("Set a deadline");
   const [budgetData, setBudgetData] = useState("Set a budget");
   const [postUpdateData, setPostUpdateData] = useState("");
@@ -56,6 +67,10 @@ export default function DashboardScreen({ route, navigation }) {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [visible, setVisible] = React.useState(false);
+
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   const flushData = () => {
     setActiveComponent(null);
@@ -77,6 +92,166 @@ export default function DashboardScreen({ route, navigation }) {
     setPostUpdateData("");
   };
 
+  const handlePass = () => {
+    // console.log(
+    //   dateData,
+    //   budgetData,
+    //   postUpdateData,
+    //   filesList.filesList,
+    //   title
+    // );
+
+    if (isNewPost) {
+      // console.log("New");
+      logResponse("notify", "Creating New Baton!");
+      let post = {
+        deadline: dateData,
+        budget: budgetData,
+        title,
+        authorId: isLogin.uid,
+        memberId: teamMemberData.id,
+        authorName:
+          isLogin.displayName != null ? isLogin.displayName : isLogin.email,
+        memberName: teamMemberData.text,
+        authorPostStatus:
+          teamMemberData.status == "accepted" ? "passed" : "pending",
+        memberPostStatus: "received",
+        createdOn: Date.now(),
+        deletedOn: 0,
+        description: description,
+      };
+      // console.log("new Post");
+      // console.log(post);
+      // return;
+      setLoading(true);
+
+      // console.log("Adding new post");
+      handleAddBaton(post, id)
+        .then((docId) => {
+          handleAddNotification({
+            seen: false,
+            message: "Baton Received",
+            description: `You received a new Baton from ${post.authorName}`,
+            type: "success",
+            uid: post.memberId,
+            date: Date.now(),
+            batonId: docId,
+          });
+
+          toast.show("You baton is created", {
+            type: "success",
+            style: { height: 50 },
+          });
+          setLoading(false);
+          navigation.navigate("DashboardMain");
+        })
+        .catch((ex) => {
+          toast.show("Failed to create your baton", {
+            type: "error",
+            style: { height: 50 },
+          });
+          logResponse("error", ex.message);
+          setLoading(false);
+        });
+    } else {
+      logResponse("notify", "Updating Baton!");
+      let editedPost = {
+        ...fetchedDataObject,
+        deadline: dateData,
+        budget: budgetData,
+        title: title,
+        description: description,
+        memberName: teamMemberData.text,
+        updateOn: Date.now(),
+      };
+
+      // console.log(editedPost);
+      // return;
+      setLoading(true);
+      handleUpdateBaton(id, editedPost)
+        .then(() => {
+          setLoading(false);
+          toast.show("Baton is update", {
+            type: "success",
+            style: { height: 50 },
+          });
+          navigation.navigate("DashboardMain");
+        })
+        .catch((ex) => {
+          setLoading(false);
+          toast.show("Failed to update your baton", {
+            type: "error",
+            style: { height: 50 },
+          });
+          logResponse("error", ex.message);
+        });
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setLoading(true);
+
+    handleDeleteBaton(fetchedDataObject.docId)
+      .then(() => {
+        setLoading(false);
+        toast.show("Baton is deleted", {
+          type: "success",
+          style: { height: 50 },
+        });
+        navigation.navigate("DashboardMain");
+      })
+      .catch((ex) => {
+        setLoading(false);
+        toast.show("Failed to delete your baton", {
+          type: "error",
+          style: { height: 50 },
+        });
+        logResponse("error", ex.message);
+      });
+  };
+
+  const handleDuplicateClick = () => {
+    setLoading(true);
+    let temp = fetchedDataObject;
+    temp.title = `${temp.title} (Duplicate)`;
+
+    handleAddBaton(temp, v4())
+      .then(() => {
+        setLoading(false);
+        toast.show("Baton is duplicated", {
+          type: "success",
+          style: { height: 50 },
+        });
+        navigation.navigate("DashboardMain");
+      })
+      .catch((ex) => {
+        setLoading(false);
+        toast.show("Failed to duplicate your baton", {
+          type: "error",
+          style: { height: 50 },
+        });
+        logResponse("error", ex.message);
+      });
+  };
+
+  const showConfirmDialog = (message, method) => {
+    return Alert.alert("Confirmation", message, [
+      // The "Yes" button
+      {
+        text: "Yes",
+        onPress: () => {
+          method();
+          closeMenu();
+        },
+      },
+      // The "No" button
+      // Does nothing but dismiss the dialog when tapped
+      {
+        text: "No",
+      },
+    ]);
+  };
+
   useEffect(
     () =>
       setFilesList({
@@ -87,7 +262,20 @@ export default function DashboardScreen({ route, navigation }) {
   );
 
   useEffect(() => {
-    console.log("BatonFormScreen Line 76: batonID", batonId);
+    if (
+      dateData != "Set a deadline" &&
+      budgetData != "Set a budget" &&
+      teamMemberData != "Select a team member" &&
+      title != "" &&
+      description != ""
+    )
+      setDisabled(false);
+    else setDisabled(true);
+  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
+
+  useEffect(() => {
+    // console.log("BatonFormScreen Line 76: batonID", batonId);
+    logResponse("info", "BatonFormScreen Line 208: batonID: " + batonId);
 
     if (batonId != null) {
       handleGetBatonFiles(batonId, setUploadedFiles);
@@ -116,9 +304,12 @@ export default function DashboardScreen({ route, navigation }) {
       )
         setIsDeleted(true);
 
-      console.log("BatonFormScreen Line 104: editable:", isEditable);
+      logResponse("warning", " isDeleted: " + isDeleted);
+      logResponse("warning", " isEditable: " + isEditable);
+
       setFetchedDataObject(filter);
       setTitle(filter.title);
+      setDescription(filter.description);
       setBudgetData(filter.budget);
 
       setDateData(filter.deadline);
@@ -140,21 +331,85 @@ export default function DashboardScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView style={{ flex: 1, marginTop: 25 }}>
         {/* Form Section */}
-        <IconButton
-          icon="arrow-left"
-          onPress={() => navigation.navigate("DashboardMain")}
-          size={26}
-        />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <IconButton
+            icon="arrow-left"
+            onPress={() =>
+              isDeleted
+                ? navigation.navigate("DeleteBatons")
+                : navigation.navigate("DashboardMain")
+            }
+            size={26}
+          />
+
+          <Menu
+            visible={visible}
+            onDismiss={closeMenu}
+            anchor={
+              <IconButton
+                icon={({ size, color }) => (
+                  <Ionicons
+                    name="ellipsis-vertical"
+                    size={size}
+                    color={color}
+                  />
+                )}
+                onPress={openMenu}
+                size={26}
+              />
+            }
+          >
+            <Menu.Item
+              onPress={() =>
+                showConfirmDialog(
+                  "Are your sure you want to remove this baton?",
+                  handleDeleteClick
+                )
+              }
+              title="Delete"
+              icon="delete"
+            />
+            <Menu.Item
+              onPress={() =>
+                showConfirmDialog(
+                  "Are your sure you want to duplicate this baton?",
+                  handleDuplicateClick
+                )
+              }
+              title="Duplicate"
+              icon="file"
+            />
+          </Menu>
+        </View>
+        {isDeleted && (
+          <NotificationBox
+            text={`You deleted this on ${moment(
+              fetchedDataObject.deletedOn
+            ).format("MMMM DD ,YYYY")}`}
+          />
+        )}
         <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-          <Text style={{ fontSize: 24 }}>
-            {title != "" ? title : "Add Title"}
-          </Text>
           <TextInput
             style={{ marginTop: 25 }}
+            theme={styles.textInput}
             placeholder="Add Text"
             onChangeText={(e) => setTitle(e)}
             mode="outlined"
             value={title}
+            disabled={
+              fetchedDataObject.authorPostStatus != "pending" &&
+              fetchedDataObject.authorPostStatus != undefined
+                ? true
+                : false
+            }
+          />
+          <TextInput
+            style={{ marginTop: 5 }}
+            placeholder="Add Desctiprion"
+            theme={styles.textInput}
+            onChangeText={(e) => setDescription(e)}
+            mode="outlined"
+            value={description}
             disabled={
               fetchedDataObject.authorPostStatus != "pending" &&
               fetchedDataObject.authorPostStatus != undefined
@@ -256,27 +511,27 @@ export default function DashboardScreen({ route, navigation }) {
               navigation.navigate("PostUpdateSelection", {
                 setSelectedItem: (e) => setPostUpdateData(e),
                 selectedItem: postUpdateData,
+                batonId: id,
               })
             }
             isActive={postUpdateData != ""}
           >
             Post an update
           </Selectable>
-          {loading ? (
-            <ActivityIndicator />
-          ) : (
-            isEditable &&
-            !isDeleted && (
-              <Selectable
-                isActive={true}
-                contentStyle={{ justifyContent: "center" }}
-                // disabled={true}
-                onPress={() => navigation.navigate("DashboardMain")}
-              >
-                Pass
-              </Selectable>
-            )
-          )}
+          <View style={{ marginTop: 15 }}>
+            {loading ? (
+              <ActivityIndicator size={26} />
+            ) : (
+              isEditable &&
+              !isDeleted && (
+                <TealButton
+                  disabled={disabled}
+                  onPress={handlePass}
+                  text="Pass"
+                />
+              )
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -287,5 +542,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // marginTop: Platform.OS === "android" ? 24 : 0
+  },
+  textInput: {
+    colors: {
+      placeholder: "black",
+      background: "transparent",
+      // underlineColor: "transparent",
+      // primary: "transparent",
+    },
   },
 });

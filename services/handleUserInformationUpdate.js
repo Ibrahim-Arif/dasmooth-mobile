@@ -5,8 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 export const handleUserInformationUpdate = async (
   email,
   displayName,
-  photoURL = "",
-  setUser
+  photoURL = ""
 ) => {
   try {
     const auth = getAuth();
@@ -21,12 +20,7 @@ export const handleUserInformationUpdate = async (
       displayName: displayName,
       photoURL: photoURL,
     });
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-      }
-    });
+    return photoURL;
   } catch (ex) {
     console.log(ex);
     throw new Error(ex);

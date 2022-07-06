@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { DefaultTheme, TextInput } from "react-native-paper";
 import { logo } from "../assets";
@@ -11,8 +11,8 @@ import { heights, widths } from "../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
 
 export default function ForgotPasswordScreen({ navigation }) {
-  const [email, setEmail] = React.useState("");
-  const [isFieldActive, setIsFieldActive] = React.useState(false);
+  const [email, setEmail] = useState("");
+  const [isFieldActive, setIsFieldActive] = useState(false);
   const toast = useToast();
 
   let inputTheme = {
@@ -21,7 +21,6 @@ export default function ForgotPasswordScreen({ navigation }) {
     colors: {
       ...DefaultTheme.colors,
       primary: colors.teal100,
-      // accent: "#f1c40f",
       text: isFieldActive ? "black" : "white",
       background: isFieldActive ? "white" : "transparent",
       placeholder: isFieldActive ? "black" : "white",

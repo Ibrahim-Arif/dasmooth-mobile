@@ -17,6 +17,7 @@ import {
   handleGetTeamMembers,
 } from "./services";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import logResponse from "./utilities/logger";
 
 const theme = {
   ...DefaultTheme,
@@ -38,6 +39,7 @@ export default function App() {
   const [permanentData, setPermanentData] = useState([]);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [photoURL, setPhotoURL] = useState("");
   const [batons, setBatons] = useState({ ...batonsList });
   const [notifications, setNotifications] = useState([]);
   const [myBatons, setMyBatons] = useState([]);
@@ -57,11 +59,14 @@ export default function App() {
     setTeamMembers,
     notifications,
     setNotifications,
+    photoURL,
+    setPhotoURL,
   };
 
   useEffect(() => {
-    // console.log(isLogin);
+    // logResponse("info", isLogin.photoURL);
     if (isLogin) {
+      setPhotoURL(isLogin.photoURL);
       handleGetTeamMembers(isLogin.uid, setTeamMembers);
       handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
       handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
@@ -77,6 +82,11 @@ export default function App() {
   }, [isLogin]);
 
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        setIsLogin(user);
+      }
+    });
     // console.log("batonsData useEffect, App.js", batonsData);
     let temp = [...myBatons, ...otherBatons];
     // temp = [...new Set(temp)]
@@ -96,12 +106,6 @@ export default function App() {
   useEffect(() => {
     setBatonsData([...permanentData]);
   }, [permanentData]);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user && user.emailVerified) {
-      setIsLogin(user);
-    }
-  });
 
   return (
     <StateProvider values={userContextValues}>

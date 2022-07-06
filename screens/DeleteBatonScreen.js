@@ -22,6 +22,7 @@ export default function DeleteBatonScreen({ navigation }) {
           bgColor="white"
           color={colors.danger}
           listItems={deletedBatons}
+          navigation={navigation}
         />
         <View style={{ height: 50 }}></View>
       </ScrollView>

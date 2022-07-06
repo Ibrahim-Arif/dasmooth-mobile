@@ -8,8 +8,9 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-
+import { firebaseAuthErrors } from "../utilities/errors";
 import { handleUpdateBatonStatus } from "./handleUpdateBatonStatus";
+
 export const handleSignIn = async (email, password) => {
   try {
     const auth = getAuth();
@@ -68,10 +69,8 @@ export const handleSignIn = async (email, password) => {
     });
     return userCredential.user;
   } catch (ex) {
-    if (ex.code == "auth/user-not-found")
-      ex.message = "No user found with this email";
-    else if (ex.code == "auth/wrong-password") ex.message = "Wrong password";
-    // console.log(ex.code)
+    // console.log(ex.code);
+    ex.message = firebaseAuthErrors[ex.code];
     throw new Error(ex.message);
   }
 };

@@ -292,7 +292,8 @@ export default function MemberSelectionComponent({
                       }}
                     />
                   ),
-                  memberId: e.receiverId,
+                  id: e.receiverId,
+                  status: e.status,
                 });
               }
             }}

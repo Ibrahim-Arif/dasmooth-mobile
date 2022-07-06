@@ -19,9 +19,10 @@ import { useUser } from "../hooks/useContext";
 import { handleUserInformationUpdate } from "../services";
 import { colors } from "../utilities/colors";
 import { widths } from "../utilities/sizes";
+import logResponse from "../utilities/logger";
 
 export default function ProfileSettingScreen({ navigation }) {
-  const { isLogin, setIsLogin } = useUser();
+  const { isLogin, setIsLogin, photoURL, setPhotoURL } = useUser();
   const [profileImage, setProfileImage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ export default function ProfileSettingScreen({ navigation }) {
   useEffect(() => {
     setEmail(isLogin.email);
     setName(isLogin.displayName);
-    setProfileImage(isLogin.photoURL);
+    setProfileImage(photoURL);
   }, []);
 
   const handleImageSelection = async () => {
@@ -45,16 +46,22 @@ export default function ProfileSettingScreen({ navigation }) {
 
   const handleSaveClick = () => {
     setLoading(true);
-    handleUserInformationUpdate(email, name, profileImage, setIsLogin)
-      .then(() => {
+    handleUserInformationUpdate(email, name, profileImage)
+      .then((url) => {
         // console.log(isLogin);
+        setPhotoURL(url);
+        // console.log(url);
         toast.show("Profile updated successfully", {
           type: "success",
           style: { height: 50 },
         });
       })
-      .catch(() => {
-        toast.show("Profile update failed", { type: "danger" });
+      .catch((ex) => {
+        logResponse("error", ex.message);
+        toast.show("Profile update failed", {
+          type: "danger",
+          style: { height: 50 },
+        });
       })
       .finally(() => {
         setLoading(false);

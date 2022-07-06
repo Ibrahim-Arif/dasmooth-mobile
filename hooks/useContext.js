@@ -16,6 +16,8 @@ export const useUser = () => {
     setPermanentData,
     notifications,
     setNotifications,
+    photoURL,
+    setPhotoURL,
   } = useContext(UserContext);
 
   return {
@@ -31,6 +33,8 @@ export const useUser = () => {
     setPermanentData,
     notifications,
     setNotifications,
+    photoURL,
+    setPhotoURL,
   };
 };
 
@@ -48,6 +52,8 @@ export const StateProvider = ({ values, children }) => {
     setPermanentData,
     notifications,
     setNotifications,
+    photoURL,
+    setPhotoURL,
   } = values;
 
   return (
@@ -65,6 +71,8 @@ export const StateProvider = ({ values, children }) => {
         setPermanentData,
         notifications,
         setNotifications,
+        photoURL,
+        setPhotoURL,
       }}
     >
       {children}

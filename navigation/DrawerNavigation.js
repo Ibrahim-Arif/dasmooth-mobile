@@ -23,19 +23,35 @@ import { getAuth } from "firebase/auth";
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent(props) {
-  const { setIsLogin, notifications, isLogin } = useUser();
+  const { setIsLogin, notifications, isLogin, photoURL } = useUser();
   const auth = getAuth();
+
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
         <View style={styles.userInfoSection}>
-          <Avatar.Image
-            source={{
-              uri: isLogin.photoURL,
-            }}
-            size={80}
-          />
-          <Title style={styles.title}>User Name</Title>
+          {photoURL == null || photoURL == "" || photoURL.includes("blob") ? (
+            <Avatar.Text
+              style={{ backgroundColor: colors.teal100 }}
+              size={80}
+              label={
+                isLogin.displayName != null
+                  ? isLogin.displayName.substring(0, 2).toUpperCase()
+                  : isLogin.email.substring(0, 2).toUpperCase()
+              }
+            />
+          ) : (
+            <Avatar.Image
+              source={{
+                uri: photoURL,
+              }}
+              size={80}
+            />
+          )}
+
+          <Title style={styles.title}>
+            {isLogin.displayName != null ? isLogin.displayName : isLogin.email}
+          </Title>
         </View>
         <PaperDrawer.Section style={styles.drawerSection}>
           <DrawerItem
@@ -48,7 +64,7 @@ function CustomDrawerContent(props) {
             )}
             label="Dashboard"
             onPress={() => {
-              props.navigation.navigate("Dashboard");
+              props.navigation.navigate("DashboardMain");
             }}
           />
 
@@ -109,8 +125,8 @@ function CustomDrawerContent(props) {
             )}
             label="Logout"
             onPress={() => {
-              auth.signOut();
               setIsLogin(false);
+              auth.signOut();
               // props.navigation.navigate("SignIn");
             }}
           />
