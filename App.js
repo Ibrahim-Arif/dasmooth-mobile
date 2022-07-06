@@ -32,6 +32,7 @@ initializeApp(firebaseConfig);
 export default function App() {
   LogBox.ignoreLogs([
     "Non-serializable values were found in the navigation state",
+    "Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in %s.%s, a useEffect cleanup function,",
   ]);
 
   const [isLogin, setIsLogin] = useState(false);

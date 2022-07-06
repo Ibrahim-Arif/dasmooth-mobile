@@ -1,4 +1,4 @@
-import React, { isValidElement, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -60,6 +60,7 @@ export default function SignInScreen({ navigation }) {
         // console.log(ex);
       });
   };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
