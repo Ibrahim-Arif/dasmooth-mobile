@@ -43,7 +43,7 @@ export default function SignUpScreen({ navigation }) {
 
   const handleSignUpClick = (email, password) => {
     setLoading(true);
-    handleSignUp(email, password)
+    handleSignUp(email, password, false)
       .then((user) => {
         setLoading(false);
         navigation.navigate("VerifyEmail");
