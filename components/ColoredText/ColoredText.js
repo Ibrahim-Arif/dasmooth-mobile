@@ -5,6 +5,7 @@ export default function ColoredText({
   color,
   style,
   underLine = false,
+  fontSize = 18,
   onPress = () => null,
   children,
 }) {
@@ -12,6 +13,7 @@ export default function ColoredText({
     <Text
       style={{
         color: color,
+        fontSize: fontSize,
         ...style,
         textDecorationLine: underLine ? "underline" : "none",
       }}

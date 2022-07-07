@@ -70,13 +70,19 @@ export default function FileAttachmentComponent({
       handleAddBatonFiles(imagesData)
         .then(() => {
           // generateNotification("success", "Images uploaded successfully");
-          toast.show("Images uploaded successfully", { type: "success" });
+          toast.show("Images uploaded successfully", {
+            type: "success",
+            style: { height: 50 },
+          });
           setUploading(false);
           closeScreen();
           // clickOk();
         })
         .catch((ex) => {
-          toast.show("Error uploading images", { type: "danger" });
+          toast.show("Error uploading images", {
+            type: "danger",
+            style: { height: 50 },
+          });
           // generateNotification("error", "Failed to upload files!");
           setUploading(false);
         });
@@ -97,9 +103,7 @@ export default function FileAttachmentComponent({
       else
         setSelectedItem({
           filesList: [...imageData.filesList, ...uploadedFiles],
-          text: `${
-            uploadedFiles.length + imageData.filesList.length
-          } files attached`,
+          text: `${uploadedFiles.length} files attached`,
         });
     };
   }, [imageData, uploadedFiles]);
@@ -165,7 +169,7 @@ export default function FileAttachmentComponent({
       </ScrollView>
 
       <ColoredText color="teal" style={styles.attachFileText}>
-        {imageData.filesList.length + uploadedFiles.length} files attached
+        {uploadedFiles.length} files attached
       </ColoredText>
       <View style={styles.tealButtonContainer}>
         {uploading ? (

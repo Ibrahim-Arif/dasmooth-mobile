@@ -1,4 +1,4 @@
-import React, { Children } from "react";
+import React from "react";
 import { SafeAreaView, Platform, StyleSheet } from "react-native";
 import { Appbar } from "react-native-paper";
 
@@ -23,6 +23,6 @@ export default function AppBarView({ navigation, children }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginTop: Platform.OS === "android" ? 24 : 0
+    // marginTop: Platform.OS === "android" ? 24 : 0,
   },
 });

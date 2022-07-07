@@ -7,6 +7,7 @@ import {
   Platform,
   SafeAreaView,
   Image,
+  StatusBar,
 } from "react-native";
 import { Appbar } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
@@ -136,6 +137,7 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar />
       <>
         <Appbar style={{ justifyContent: "space-between" }}>
           <Appbar.Action icon="menu" onPress={() => navigation.openDrawer()} />

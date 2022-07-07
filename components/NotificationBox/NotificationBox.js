@@ -6,7 +6,7 @@ export default function NotificationBox({ text }) {
   return (
     <View
       style={{
-        backgroundColor: colors.cgLight80,
+        backgroundColor: colors.cgLight60,
         color: "black",
         borderRadius: 15,
         padding: 30,

@@ -62,7 +62,7 @@ export default function DashboardScreen({ route, navigation }) {
     status: "pending",
     deletedOn: 0,
   });
-
+  const [fetchingLoading, setFetchingLoading] = useState(false);
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
@@ -278,6 +278,7 @@ export default function DashboardScreen({ route, navigation }) {
     logResponse("info", "BatonFormScreen Line 208: batonID: " + batonId);
 
     if (batonId != null) {
+      setFetchingLoading(true);
       handleGetBatonFiles(batonId, setUploadedFiles);
       setIsNewPost(false);
       if (batonsData.length == 0) return;
@@ -319,6 +320,8 @@ export default function DashboardScreen({ route, navigation }) {
         icon: null,
       });
       setID(batonId);
+
+      setFetchingLoading(false);
     } else {
       let tempId = v4();
       setID(tempId);
@@ -329,211 +332,228 @@ export default function DashboardScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={{ flex: 1, marginTop: 25 }}>
-        {/* Form Section */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <IconButton
-            icon="arrow-left"
-            onPress={() =>
-              isDeleted
-                ? navigation.navigate("DeleteBatons")
-                : navigation.navigate("DashboardMain")
-            }
-            size={26}
-          />
-
-          <Menu
-            visible={visible}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton
-                icon={({ size, color }) => (
-                  <Ionicons
-                    name="ellipsis-vertical"
-                    size={size}
-                    color={color}
-                  />
-                )}
-                onPress={openMenu}
-                size={26}
-              />
-            }
-          >
-            <Menu.Item
-              onPress={() =>
-                showConfirmDialog(
-                  "Are your sure you want to remove this baton?",
-                  handleDeleteClick
-                )
-              }
-              title="Delete"
-              icon="delete"
-            />
-            <Menu.Item
-              onPress={() =>
-                showConfirmDialog(
-                  "Are your sure you want to duplicate this baton?",
-                  handleDuplicateClick
-                )
-              }
-              title="Duplicate"
-              icon="file"
-            />
-          </Menu>
+      {fetchingLoading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size={48} />
         </View>
-        {isDeleted && (
-          <NotificationBox
-            text={`You deleted this on ${moment(
-              fetchedDataObject.deletedOn
-            ).format("MMMM DD ,YYYY")}`}
-          />
-        )}
-        <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-          <TextInput
-            style={{ marginTop: 25 }}
-            theme={styles.textInput}
-            placeholder="Add Text"
-            onChangeText={(e) => setTitle(e)}
-            mode="outlined"
-            value={title}
-            disabled={
-              fetchedDataObject.authorPostStatus != "pending" &&
-              fetchedDataObject.authorPostStatus != undefined
-                ? true
-                : false
-            }
-          />
-          <TextInput
-            style={{ marginTop: 5 }}
-            placeholder="Add Desctiprion"
-            theme={styles.textInput}
-            onChangeText={(e) => setDescription(e)}
-            mode="outlined"
-            value={description}
-            disabled={
-              fetchedDataObject.authorPostStatus != "pending" &&
-              fetchedDataObject.authorPostStatus != undefined
-                ? true
-                : false
-            }
-          />
-          <Selectable
-            style={{ marginTop: 25 }}
-            bgColor={colors.tealLight90}
-            icon={
-              <Avatar.Text
-                size={36}
-                style={{
-                  backgroundColor: batonId != null ? "white" : colors.teal100,
-                  color: batonId == null ? "white" : colors.teal100,
-                }}
-                label={teamMemberData.text.substring(0, 2).toUpperCase()}
-              />
-            }
-            isActive={teamMemberData.text != "Select a team member"}
-            onPress={() =>
-              isEditable &&
-              !isDeleted &&
-              navigation.navigate("MemberSelection", {
-                setSelectedItem: (e) => setTeamMemberData(e),
-              })
-            }
+      ) : (
+        <ScrollView style={{ flex: 1, marginTop: 25 }}>
+          {/* Form Section */}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            {teamMemberData.text}
-          </Selectable>
-          <Selectable
-            bgColor={colors.tealLight90}
-            icon={
-              <Avatar.Icon
-                size={40}
-                icon={({ color, size }) => (
-                  <AntDesign name="calendar" size={size} color={color} />
-                )}
-              />
-            }
-            isActive={dateData != "Set a deadline"}
-            onPress={() =>
-              isEditable &&
-              !isDeleted &&
-              navigation.navigate("DateSelection", {
-                setSelectedItem: (e) => setDateData(e),
-                selectedItem: dateData,
-              })
-            }
-          >
-            {dateData}
-          </Selectable>
-          <Selectable
-            bgColor={colors.tealLight90}
-            icon={
-              <Avatar.Icon
-                size={40}
-                icon={({ color, size }) => (
-                  <FontAwesome name="dollar" size={size} color={color} />
-                )}
-              />
-            }
-            onPress={() =>
-              isEditable &&
-              !isDeleted &&
-              navigation.navigate("BudgetSelection", {
-                setSelectedItem: (e) => setBudgetData(e),
-                selectedItem: budgetData,
-              })
-            }
-            isActive={budgetData != "Set a budget"}
-          >
-            {budgetData}
-          </Selectable>
-          <Selectable
-            bgColor={colors.tealLight90}
-            icon={<Avatar.Icon size={40} icon="attachment" />}
-            isActive={filesList.filesList.length > 0}
-            onPress={() =>
-              !isDeleted &&
-              navigation.navigate("FileSelection", {
-                setSelectedItem: (e) => setFilesList(e),
-                selectedItem: filesList,
-                batonId: batonId,
-              })
-            }
-          >
-            {/* {filesList.filesList.length > 0
+            <IconButton
+              icon="arrow-left"
+              onPress={() =>
+                isDeleted
+                  ? navigation.navigate("DeleteBatons")
+                  : navigation.navigate("DashboardMain")
+              }
+              size={26}
+            />
+
+            {!isDeleted &&
+              batonId != null &&
+              fetchedDataObject.authorId == isLogin.uid && (
+                <Menu
+                  visible={visible}
+                  onDismiss={closeMenu}
+                  anchor={
+                    <IconButton
+                      icon={({ size, color }) => (
+                        <Ionicons
+                          name="ellipsis-vertical"
+                          size={size}
+                          color={color}
+                        />
+                      )}
+                      onPress={openMenu}
+                      size={24}
+                    />
+                  }
+                >
+                  <Menu.Item
+                    onPress={() =>
+                      showConfirmDialog(
+                        "Are your sure you want to remove this baton?",
+                        handleDeleteClick
+                      )
+                    }
+                    title="Delete"
+                    icon="delete"
+                    style={{ height: 35 }}
+                  />
+                  <Menu.Item
+                    onPress={() =>
+                      showConfirmDialog(
+                        "Are your sure you want to duplicate this baton?",
+                        handleDuplicateClick
+                      )
+                    }
+                    title="Duplicate"
+                    icon="file"
+                    style={{ height: 35 }}
+                  />
+                </Menu>
+              )}
+          </View>
+          {isDeleted && (
+            <NotificationBox
+              text={`You deleted this on ${moment(
+                fetchedDataObject.deletedOn
+              ).format("MMMM DD ,YYYY")}`}
+            />
+          )}
+          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+            <TextInput
+              style={{ marginTop: 25 }}
+              placeholder="Add Title"
+              onChangeText={(e) => setTitle(e)}
+              mode="outlined"
+              outlineColor="transparent"
+              placeholderTextColor="black"
+              value={title}
+              disabled={
+                fetchedDataObject.authorPostStatus != "pending" &&
+                fetchedDataObject.authorPostStatus != undefined
+                  ? true
+                  : false
+              }
+            />
+            <TextInput
+              style={{ marginTop: 5 }}
+              placeholder="Add Desctiprion"
+              placeholderTextColor="black"
+              onChangeText={(e) => setDescription(e)}
+              mode="outlined"
+              value={description}
+              disabled={
+                fetchedDataObject.authorPostStatus != "pending" &&
+                fetchedDataObject.authorPostStatus != undefined
+                  ? true
+                  : false
+              }
+            />
+            <Selectable
+              style={{ marginTop: 25 }}
+              bgColor={colors.tealLight90}
+              icon={
+                <Avatar.Text
+                  size={36}
+                  style={{
+                    backgroundColor: batonId != null ? "white" : colors.teal100,
+                    color: batonId == null ? "white" : colors.teal100,
+                  }}
+                  label={teamMemberData.text.substring(0, 2).toUpperCase()}
+                />
+              }
+              isActive={teamMemberData.text != "Select a team member"}
+              onPress={() =>
+                isEditable &&
+                !isDeleted &&
+                navigation.navigate("MemberSelection", {
+                  setSelectedItem: (e) => setTeamMemberData(e),
+                })
+              }
+            >
+              {teamMemberData.text}
+            </Selectable>
+            <Selectable
+              bgColor={colors.tealLight90}
+              icon={
+                <Avatar.Icon
+                  size={40}
+                  icon={({ color, size }) => (
+                    <AntDesign name="calendar" size={size} color={color} />
+                  )}
+                />
+              }
+              isActive={dateData != "Set a deadline"}
+              onPress={() =>
+                isEditable &&
+                !isDeleted &&
+                navigation.navigate("DateSelection", {
+                  setSelectedItem: (e) => setDateData(e),
+                  selectedItem: dateData,
+                })
+              }
+            >
+              {dateData}
+            </Selectable>
+            <Selectable
+              bgColor={colors.tealLight90}
+              icon={
+                <Avatar.Icon
+                  size={40}
+                  icon={({ color, size }) => (
+                    <FontAwesome name="dollar" size={size} color={color} />
+                  )}
+                />
+              }
+              onPress={() =>
+                isEditable &&
+                !isDeleted &&
+                navigation.navigate("BudgetSelection", {
+                  setSelectedItem: (e) => setBudgetData(e),
+                  selectedItem: budgetData,
+                })
+              }
+              isActive={budgetData != "Set a budget"}
+            >
+              {budgetData}
+            </Selectable>
+            <Selectable
+              bgColor={colors.tealLight90}
+              icon={<Avatar.Icon size={40} icon="attachment" />}
+              isActive={filesList.filesList.length > 0}
+              onPress={() =>
+                !isDeleted &&
+                navigation.navigate("FileSelection", {
+                  setSelectedItem: (e) => setFilesList(e),
+                  selectedItem: filesList,
+                  batonId: batonId,
+                })
+              }
+            >
+              {/* {filesList.filesList.length > 0
               ? `${filesList.filesList.length} files attached`
               : "Attach a file (Optional)"} */}
-            {filesList.text}
-          </Selectable>
-          <Selectable
-            bgColor={colors.tealLight90}
-            icon={<Avatar.Icon size={40} icon="post" />}
-            onPress={() =>
-              !isDeleted &&
-              navigation.navigate("PostUpdateSelection", {
-                setSelectedItem: (e) => setPostUpdateData(e),
-                selectedItem: postUpdateData,
-                batonId: id,
-              })
-            }
-            isActive={postUpdateData != ""}
-          >
-            Post an update
-          </Selectable>
-          <View style={{ marginTop: 15 }}>
-            {loading ? (
-              <ActivityIndicator size={26} />
-            ) : (
-              isEditable &&
-              !isDeleted && (
-                <TealButton
-                  disabled={disabled}
-                  onPress={handlePass}
-                  text="Pass"
-                />
-              )
-            )}
+              {filesList.text}
+            </Selectable>
+            <Selectable
+              bgColor={colors.tealLight90}
+              icon={<Avatar.Icon size={40} icon="post" />}
+              onPress={() =>
+                !isDeleted &&
+                navigation.navigate("PostUpdateSelection", {
+                  setSelectedItem: (e) => setPostUpdateData(e),
+                  selectedItem: postUpdateData,
+                  batonId: id,
+                })
+              }
+              isActive={postUpdateData != ""}
+            >
+              Post an update
+            </Selectable>
+            <View style={{ marginTop: 15 }}>
+              {loading ? (
+                <ActivityIndicator size={26} />
+              ) : (
+                isEditable &&
+                !isDeleted && (
+                  <TealButton
+                    disabled={disabled}
+                    onPress={handlePass}
+                    text="Pass"
+                  />
+                )
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -542,13 +562,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // marginTop: Platform.OS === "android" ? 24 : 0
-  },
-  textInput: {
-    colors: {
-      placeholder: "black",
-      background: "transparent",
-      // underlineColor: "transparent",
-      // primary: "transparent",
-    },
   },
 });

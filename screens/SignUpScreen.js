@@ -17,6 +17,7 @@ import { logo } from "../assets";
 import { colors } from "../utilities/colors";
 import { heights, widths } from "../utilities/sizes";
 import { handleSignUp } from "../services";
+import logResponse from "../utilities/logger";
 
 export default function SignUpScreen({ navigation }) {
   const [isFieldActive, setIsFieldActive] = useState(false);
@@ -49,11 +50,12 @@ export default function SignUpScreen({ navigation }) {
         navigation.navigate("VerifyEmail");
       })
       .catch((ex) => {
-        toast.show("Error signing up", {
+        toast.show(ex.message, {
           type: "danger",
           style: { height: 50 },
         });
         setLoading(false);
+        logResponse("error", ex.message);
       });
   };
 

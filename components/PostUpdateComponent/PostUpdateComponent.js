@@ -35,7 +35,7 @@ export default function PostUpdateComponent({
         ? ""
         : photoURL;
 
-    if (batonId != null) {
+    if (text != "" && text != undefined && batonId != null) {
       let data = {
         batonId,
         text: text,
@@ -44,13 +44,13 @@ export default function PostUpdateComponent({
         photoURL: url,
       };
 
+      setText("");
       handleAddPostUpdate(data)
         .then(() => {
           toast.show("Post Update Successfully", {
             type: "success",
             style: { height: 50 },
           });
-          setText("");
         })
         .catch((ex) => {
           logResponse("error", ex.message);
@@ -82,7 +82,7 @@ export default function PostUpdateComponent({
         <View>
           {postData.map((e, i) => (
             <View key={i} style={styles.commentContainer}>
-              <View style={{ marginLeft: 10, marginRight: 10 }}>
+              <View style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}>
                 {e.photoURL != "" && e.photoURL ? (
                   <Avatar.Image source={{ uri: e.photoURL }} size={54} />
                 ) : (
@@ -93,12 +93,27 @@ export default function PostUpdateComponent({
                   />
                 )}
               </View>
-              <View style={{ flexDirection: "column" }}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  marginTop: 10,
+                  width: 0,
+                  flexGrow: 1,
+                  flex: 1,
+                }}
+              >
                 <Text style={{ fontSize: 13 }}>{e.username}</Text>
                 <Text style={{ fontSize: 13 }}>
                   {moment(e.timestamp).format("MMMM DD, YYYY - hh:mm:ss A ")}
                 </Text>
-                <Text style={{ fontWeight: "600" }}>{e.text}</Text>
+                <Text
+                  style={{
+                    fontWeight: "600",
+                    textAlign: "justify",
+                  }}
+                >
+                  {e.text}
+                </Text>
               </View>
             </View>
           ))}
@@ -111,15 +126,13 @@ export default function PostUpdateComponent({
 
 const styles = StyleSheet.create({
   commentContainer: {
-    // marginTop: 10,
     // backgroundColor: "tomato",
     borderTopWidth: 1,
     borderTopColor: "#e8e8e8",
     borderBottomWidth: 1,
     borderBottomColor: "#e8e8e8",
-    height: 80,
-    width: "100%",
+    minHeight: 80,
+    width: widths.width90,
     flexDirection: "row",
-    alignItems: "center",
   },
 });

@@ -66,46 +66,61 @@ export default function App() {
 
   useEffect(() => {
     // logResponse("info", isLogin.photoURL);
-    if (isLogin) {
-      setPhotoURL(isLogin.photoURL);
-      handleGetTeamMembers(isLogin.uid, setTeamMembers);
-      handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
-      handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
-      handleGetNotifications(isLogin.uid, setNotifications);
-    } else {
-      setPermanentData([]);
-      setBatonsData([]);
-      setMyBatons([]);
-      setOtherBatons([]);
-      setTeamMembers([]);
-      setNotifications([]);
-    }
+    let isMounted = true;
+    if (isMounted)
+      if (isLogin) {
+        setPhotoURL(isLogin.photoURL);
+        handleGetTeamMembers(isLogin.uid, setTeamMembers);
+        handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
+        handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
+        handleGetNotifications(isLogin.uid, setNotifications);
+      } else {
+        setPermanentData([]);
+        setBatonsData([]);
+        setMyBatons([]);
+        setOtherBatons([]);
+        setTeamMembers([]);
+        setNotifications([]);
+      }
+    return () => {
+      isMounted = false;
+    };
   }, [isLogin]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user && user.emailVerified) {
-        setIsLogin(user);
-      }
-    });
-    // console.log("batonsData useEffect, App.js", batonsData);
-    let temp = [...myBatons, ...otherBatons];
-    // temp = [...new Set(temp)]
-    const filteredArr = temp.reduce((acc, current) => {
-      const x = acc.find((item) => item.docId === current.docId);
-      if (!x) {
-        return acc.concat([current]);
-      } else {
-        return acc;
-      }
-    }, []);
+    let isMounted = true;
+    if (isMounted) {
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.emailVerified) {
+          setIsLogin(user);
+        }
+      });
+      // console.log("batonsData useEffect, App.js", batonsData);
+      let temp = [...myBatons, ...otherBatons];
+      // temp = [...new Set(temp)]
+      const filteredArr = temp.reduce((acc, current) => {
+        const x = acc.find((item) => item.docId === current.docId);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
 
-    setPermanentData(filteredArr);
+      setPermanentData(filteredArr);
+    }
+    return () => {
+      isMounted = false;
+    };
     // console.log("Permanent:", permanentData);
   }, [myBatons, otherBatons]);
 
   useEffect(() => {
-    setBatonsData([...permanentData]);
+    let isMounted = true;
+    if (isMounted) setBatonsData([...permanentData]);
+    return () => {
+      isMounted = false;
+    };
   }, [permanentData]);
 
   return (
