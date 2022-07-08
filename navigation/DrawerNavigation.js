@@ -5,12 +5,12 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItem,
+  DrawerItemList,
 } from "@react-navigation/drawer";
 
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { Avatar, Title, Drawer as PaperDrawer } from "react-native-paper";
 import {
-  DeleteBatonScreen,
   NotificationScreen,
   ProfileSettingScreen,
   TeamMembersScreen,
@@ -19,15 +19,16 @@ import { colors } from "../utilities/colors";
 import { DashboardNavigaiton } from "./DashboardNavigation";
 import { useUser } from "../hooks/useContext";
 import { getAuth } from "firebase/auth";
+import { DeletedBatonsNavigation } from "./DeletedBatonsNavigation";
 
 const Drawer = createDrawerNavigator();
-
 function CustomDrawerContent(props) {
-  const { setIsLogin, notifications, isLogin, photoURL } = useUser();
   const auth = getAuth();
 
+  const { setIsLogin, isLogin, photoURL } = useUser();
+
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView>
       <View style={styles.drawerContent}>
         <View style={styles.userInfoSection}>
           {photoURL == null || photoURL == "" || photoURL.includes("blob") ? (
@@ -45,80 +46,20 @@ function CustomDrawerContent(props) {
               source={{
                 uri: photoURL,
               }}
-              size={80}
+              size={100}
             />
           )}
 
-          <Title style={styles.title}>
+          <Title
+            style={
+              isLogin.displayName != null ? { fontSize: 16 } : { fontSize: 13 }
+            }
+          >
             {isLogin.displayName != null ? isLogin.displayName : isLogin.email}
           </Title>
         </View>
         <PaperDrawer.Section style={styles.drawerSection}>
-          <DrawerItem
-            icon={({ color, focused, size }) => (
-              <MaterialIcons
-                name="dashboard"
-                size={size}
-                color={colors.teal100}
-              />
-            )}
-            label="Dashboard"
-            onPress={() => {
-              props.navigation.navigate("DashboardMain");
-            }}
-          />
-
-          <DrawerItem
-            icon={({ color, focused, size }) =>
-              notifications.length > 0 ? (
-                <View
-                  style={{
-                    width: 24,
-                    height: 24,
-                    backgroundColor: colors.danger,
-                    borderRadius: 12,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "white" }}>{notifications.length}</Text>
-                </View>
-              ) : (
-                <AntDesign name="bells" size={size} color={colors.teal100} />
-              )
-            }
-            label="Notification"
-            onPress={() => {
-              props.navigation.navigate("Notification");
-            }}
-          />
-          <DrawerItem
-            icon={({ color, focused, size }) => (
-              <AntDesign name="setting" size={size} color={colors.teal100} />
-            )}
-            label="Profile Settings"
-            onPress={() => {
-              props.navigation.navigate("ProfileSettings");
-            }}
-          />
-          <DrawerItem
-            icon={({ color, focused, size }) => (
-              <AntDesign name="team" size={size} color={colors.teal100} />
-            )}
-            label="Team Members"
-            onPress={() => {
-              props.navigation.navigate("TeamMembers");
-            }}
-          />
-          <DrawerItem
-            icon={({ color, focused, size }) => (
-              <AntDesign name="delete" size={size} color={colors.teal100} />
-            )}
-            label="Delete Batons"
-            onPress={() => {
-              props.navigation.navigate("DeleteBatons");
-            }}
-          />
+          <DrawerItemList {...props} />
           <DrawerItem
             icon={({ color, focused, size }) => (
               <AntDesign name="logout" size={size} color={colors.teal100} />
@@ -136,21 +77,80 @@ function CustomDrawerContent(props) {
   );
 }
 export default function DrawerNavigation() {
+  const { notifications } = useUser();
   return (
     <Drawer.Navigator
       initialRouteName="Dashboard"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
-        drawerActiveTintColor: colors.teal100,
-        title: "LOGO",
+        // drawerActiveTintColor: colors.teal100,
+        // title: "Dashboard",
         headerShown: false,
       }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      <Drawer.Screen name="Dashboard" component={DashboardNavigaiton} />
-      <Drawer.Screen name="Notification" component={NotificationScreen} />
-      <Drawer.Screen name="ProfileSettings" component={ProfileSettingScreen} />
-      <Drawer.Screen name="TeamMembers" component={TeamMembersScreen} />
-      <Drawer.Screen name="DeleteBatons" component={DeleteBatonScreen} />
+      <Drawer.Screen
+        name="Dashboard"
+        component={DashboardNavigaiton}
+        options={{
+          drawerIcon: ({ color, focused, size }) => (
+            <MaterialIcons
+              name="dashboard"
+              size={size}
+              color={colors.teal100}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={{
+          drawerIcon: ({ color, focused, size }) =>
+            notifications.length > 0 ? (
+              <View
+                style={{
+                  width: 24,
+                  height: 24,
+                  backgroundColor: colors.danger,
+                  borderRadius: 12,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: "white" }}>{notifications.length}</Text>
+              </View>
+            ) : (
+              <AntDesign name="bells" size={size} color={colors.teal100} />
+            ),
+        }}
+      />
+      <Drawer.Screen
+        name="Profile Settings"
+        component={ProfileSettingScreen}
+        options={{
+          drawerIcon: ({ color, focused, size }) => (
+            <AntDesign name="setting" size={size} color={colors.teal100} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Team Members"
+        component={TeamMembersScreen}
+        options={{
+          drawerIcon: ({ color, focused, size }) => (
+            <AntDesign name="team" size={size} color={colors.teal100} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Deleted Batons"
+        component={DeletedBatonsNavigation}
+        options={{
+          drawerIcon: ({ color, focused, size }) => (
+            <AntDesign name="delete" size={size} color={colors.teal100} />
+          ),
+        }}
+      />
     </Drawer.Navigator>
   );
 }

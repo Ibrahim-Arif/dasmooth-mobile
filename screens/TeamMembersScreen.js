@@ -4,11 +4,11 @@ import { AppBarView, MemberSelectionComponent } from "../components";
 import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 
-export default function TeamMembersScreen({ navigation }) {
+export default function TeamMembersScreen({ navigation, route }) {
   const { teamMembers } = useUser();
 
   return (
-    <AppBarView navigation={navigation}>
+    <AppBarView navigation={navigation} route={route}>
       <View style={{ marginLeft: 25, marginTop: 25 }}>
         <Text style={{ fontSize: 24, color: colors.textColor }}>
           Team Members

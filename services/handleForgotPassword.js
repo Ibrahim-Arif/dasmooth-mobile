@@ -1,4 +1,6 @@
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import logResponse from "../utilities/logger";
+import { firebaseAuthErrors } from "../utilities/errors";
 
 export const handleForgotPassword = async (email) => {
   try {
@@ -6,6 +8,7 @@ export const handleForgotPassword = async (email) => {
     await sendPasswordResetEmail(auth, email);
     // console.log("here");
   } catch (ex) {
-    throw new Error(ex);
+    ex.message = firebaseAuthErrors[ex.code];
+    throw new Error(ex.message);
   }
 };

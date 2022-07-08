@@ -91,8 +91,8 @@ export default function ForgotPasswordScreen({ navigation }) {
                   navigation.navigate("SignIn");
                 })
                 .catch((ex) => {
-                  console.log(ex);
-                  toast.show("Something went wrong. Please try again.", {
+                  // console.log(ex);
+                  toast.show(ex.message, {
                     type: "danger",
                   });
                 });

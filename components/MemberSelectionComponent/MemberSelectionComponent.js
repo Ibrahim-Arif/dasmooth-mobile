@@ -5,10 +5,14 @@ import {
   View,
   Modal,
   StyleSheet,
+  Alert,
   ActivityIndicator,
 } from "react-native";
 import { Avatar, Button, TextInput } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
+import { Formik } from "formik";
+import * as yup from "yup";
+
 import { colors } from "../../utilities/colors";
 import { heights, widths } from "../../utilities/sizes";
 import {
@@ -21,6 +25,7 @@ import Selectable from "../Selectable/Selectable";
 import TealButton from "../TealButton/TealButton";
 import { useUser } from "../../hooks/useContext";
 import { useToast } from "react-native-toast-notifications";
+import ColoredText from "../ColoredText/ColoredText";
 
 export default function MemberSelectionComponent({
   setSelectedItem,
@@ -31,16 +36,19 @@ export default function MemberSelectionComponent({
   const [member, setMember] = useState({ text: "", image: null });
   const [membersList, setMembersList] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
+
   const [inviteMode, setInviteMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [clickedMemberName, setClickedMemberName] = useState("");
   const [docId, setDocId] = useState("");
 
   const { isLogin } = useUser();
   const toast = useToast();
-
+  let schema = yup.object().shape({
+    email: yup.string().email().required().label("Email"),
+    name: yup.string().required().label("Member Name"),
+  });
   useEffect(() => {
     // return () => {
     let data = members;
@@ -64,6 +72,7 @@ export default function MemberSelectionComponent({
       .then(() => {
         toast.show(`Member deleted`, {
           type: "success",
+          style: { height: 50 },
         });
         setModalVisible(false);
       })
@@ -71,12 +80,13 @@ export default function MemberSelectionComponent({
         console.log(ex);
         toast.show(`Failed to delete ${member.text}`, {
           type: "danger",
+          style: { height: 50 },
         });
       })
       .finally(() => setLoading(false));
   };
 
-  const handleInviteUser = () => {
+  const handleInviteUser = (inviteEmail, inviteName) => {
     setLoading(true);
     handleSignUp(inviteEmail, null, true)
       .then((user) => {
@@ -170,52 +180,94 @@ export default function MemberSelectionComponent({
               }}
             >
               {inviteMode ? (
-                <>
-                  <TextInput
-                    placeholder="Email"
-                    onChangeText={(e) => setInviteEmail(e)}
-                    mode="outlined"
-                    value={inviteEmail}
-                    style={{ height: 45 }}
-                  />
-                  <TextInput
-                    placeholder="Name"
-                    onChangeText={(e) => setInviteName(e)}
-                    mode="outlined"
-                    value={inviteName}
-                    style={{ height: 45, marginTop: 15 }}
-                  />
+                <Formik
+                  initialValues={{ email: "", name: "" }}
+                  onSubmit={(values) =>
+                    handleInviteUser(values.email, values.name)
+                  }
+                  validationSchema={schema}
+                >
+                  {({ handleChange, handleSubmit, values, errors }) => (
+                    <View>
+                      <TextInput
+                        placeholder="Email"
+                        onChangeText={handleChange("email")}
+                        mode="outlined"
+                        value={values.email}
+                        style={{ height: 45 }}
+                      />
+                      <ColoredText
+                        color="red"
+                        visible={errors.email}
+                        fontSize={12}
+                      >
+                        {errors.email}
+                      </ColoredText>
+
+                      <TextInput
+                        placeholder="Name"
+                        onChangeText={handleChange("name")}
+                        mode="outlined"
+                        value={values.name}
+                        style={{ height: 45, marginTop: 15 }}
+                      />
+                      <ColoredText
+                        color="red"
+                        visible={errors.name}
+                        fontSize={12}
+                      >
+                        {errors.name}
+                      </ColoredText>
+
+                      {loading ? (
+                        <ActivityIndicator style={styles.centerMe} />
+                      ) : (
+                        <Button
+                          mode="contained"
+                          onPress={handleSubmit}
+                          style={[
+                            styles.centerMe,
+                            {
+                              width: widths.width50p,
+                            },
+                          ]}
+                        >
+                          Submit
+                        </Button>
+                      )}
+                    </View>
+                  )}
+                </Formik>
+              ) : (
+                <View style={{ alignItems: "center" }}>
+                  <Text style={{ fontSize: 14, textAlign: "center" }}>
+                    Are you sure you want to delete{" "}
+                    <Text style={{ fontWeight: "bold" }}>
+                      {clickedMemberName}
+                    </Text>
+                    ?
+                  </Text>
+
                   {loading ? (
-                    <ActivityIndicator style={styles.centerMe} />
+                    <ActivityIndicator
+                      style={{ marginTop: 20 }}
+                      size={26}
+                      color={colors.teal100}
+                    />
                   ) : (
                     <Button
                       mode="contained"
-                      onPress={handleInviteUser}
-                      style={[
-                        styles.centerMe,
-                        {
-                          width: widths.width50p,
-                        },
-                      ]}
+                      onPress={handleDeleteUser}
+                      style={{
+                        width: widths.width50p,
+                        alignSelf: "center",
+                        marginTop: 25,
+                      }}
                     >
-                      Submit
+                      Yes
                     </Button>
                   )}
-                </>
-              ) : loading ? (
-                <ActivityIndicator />
-              ) : (
-                <Button
-                  mode="contained"
-                  onPress={handleDeleteUser}
-                  style={{
-                    width: widths.width50p,
-                    alignSelf: "center",
-                    marginTop: 15,
-                  }}
-                >
-                  Delete
-                </Button>
+                </View>
               )}
             </View>
           </View>
@@ -277,6 +329,7 @@ export default function MemberSelectionComponent({
               if (!formMode) {
                 setInviteMode(false);
                 setModalVisible(true);
+                setClickedMemberName(e.name);
                 setDocId(e.docId);
               } else {
                 setMember({

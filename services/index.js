@@ -19,8 +19,9 @@ import { handleUpdateNotificationStatus } from "./handleUpdateNotificationStatus
 import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
-
+import { handleAddNotification } from "./handleAddNotification";
 export {
+  handleAddNotification,
   handleAddTeamMemberByInvite,
   handleUpdateBaton,
   handleAddSystemUserToMember,

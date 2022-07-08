@@ -1,5 +1,6 @@
 import { DefaultTheme as NavigationDefaultTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StackActions } from "@react-navigation/native";
 import {
   DashboardScreen,
   BatonFormScreen,
@@ -10,6 +11,7 @@ import {
   PostUpdateFormScreen,
 } from "../screens";
 import { colors } from "../utilities/colors";
+import { useEffect } from "react";
 
 const Stack = createNativeStackNavigator();
 const MyTheme = {
@@ -19,7 +21,7 @@ const MyTheme = {
     primary: colors.teal100,
   },
 };
-export const DashboardNavigaiton = () => {
+export const DashboardNavigaiton = ({ navigation }) => {
   return (
     <Stack.Navigator
       initialRouteName="DashboardMain"

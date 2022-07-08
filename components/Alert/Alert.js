@@ -7,6 +7,7 @@ export default function Alert({
   message = "Lorem",
   description = "Lorem Ipsum",
   type,
+  style,
 }) {
   const getColor = (type) => {
     switch (type) {
@@ -25,15 +26,18 @@ export default function Alert({
   };
   return (
     <View
-      style={{
-        width: "100%",
-        minHeight: 50,
-        backgroundColor: getColor(type),
-        borderWidth: 0.5,
-        borderColor: colors.success,
-        padding: 15,
-        flexDirection: "row",
-      }}
+      style={[
+        {
+          width: "100%",
+          minHeight: 50,
+          backgroundColor: getColor(type),
+          borderWidth: 0.5,
+          borderColor: colors.success,
+          padding: 15,
+          flexDirection: "row",
+        },
+        style,
+      ]}
     >
       <AntDesign name="checkcircleo" size={24} color={colors.success} />
       <View style={{ marginLeft: 15, paddingRight: 25 }}>

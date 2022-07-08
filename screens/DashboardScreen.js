@@ -64,6 +64,29 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
+  const getBaton = {
+    PendingBatons,
+    PassedBatons,
+    ReceivedBatons,
+    DeclinedBatons,
+    AcceptedBatons,
+    CompleteBatons,
+  };
+  const onChangeSearch = (query) => setSearchQuery(query);
+  const renderItem = ({ item, drag, isActive }, data) => (
+    <ScaleDecorator>
+      <View style={{ marginTop: 15 }}>
+        <BatonAccordian
+          title={item.title}
+          bgColor={item.bgColor}
+          color={item.borderColor}
+          drag={drag}
+          listItems={data}
+          navigation={navigation}
+        />
+      </View>
+    </ScaleDecorator>
+  );
   useEffect(() => {
     console.log("DashBoardView");
     // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
@@ -96,16 +119,6 @@ export default function DashboardScreen({ navigation }) {
     // console.log(batons);
   }, [batonsData]);
 
-  const getBaton = {
-    PendingBatons,
-    PassedBatons,
-    ReceivedBatons,
-    DeclinedBatons,
-    AcceptedBatons,
-    CompleteBatons,
-  };
-  const onChangeSearch = (query) => setSearchQuery(query);
-
   useEffect(() => {
     if (searchQuery == "") {
       setBatonsData(permanentData);
@@ -119,21 +132,6 @@ export default function DashboardScreen({ navigation }) {
       setBatonsData(temp);
     }
   }, [searchQuery]);
-
-  const renderItem = ({ item, drag, isActive }, data) => (
-    <ScaleDecorator>
-      <View style={{ marginTop: 15 }}>
-        <BatonAccordian
-          title={item.title}
-          bgColor={item.bgColor}
-          color={item.borderColor}
-          drag={drag}
-          listItems={data}
-          navigation={navigation}
-        />
-      </View>
-    </ScaleDecorator>
-  );
 
   return (
     <SafeAreaView style={styles.container}>

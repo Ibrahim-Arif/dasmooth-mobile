@@ -5,11 +5,11 @@ import Alert from "../components/Alert/Alert";
 import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 
-export default function NotificationScreen({ navigation }) {
+export default function NotificationScreen({ navigation, route }) {
   const { notifications } = useUser();
 
   return (
-    <AppBarView navigation={navigation}>
+    <AppBarView navigation={navigation} route={route}>
       <View
         style={{ flex: 1, margin: 25, flexGrow: 1 }}
         // showsVerticalScrollIndicator={false}
@@ -24,6 +24,7 @@ export default function NotificationScreen({ navigation }) {
               message={item.message}
               description={item.description}
               type={item.type}
+              style={{ marginBottom: 15 }}
             />
           ))}
         </ScrollView>

@@ -21,7 +21,7 @@ import { colors } from "../utilities/colors";
 import { widths } from "../utilities/sizes";
 import logResponse from "../utilities/logger";
 
-export default function ProfileSettingScreen({ navigation }) {
+export default function ProfileSettingScreen({ navigation, route }) {
   const { isLogin, setIsLogin, photoURL, setPhotoURL } = useUser();
   const [profileImage, setProfileImage] = useState("");
   const [name, setName] = useState("");
@@ -32,7 +32,7 @@ export default function ProfileSettingScreen({ navigation }) {
   useEffect(() => {
     setEmail(isLogin.email);
     setName(isLogin.displayName);
-    setProfileImage(photoURL);
+    // setProfileImage(photoURL);
   }, []);
 
   const handleImageSelection = async () => {
@@ -69,7 +69,7 @@ export default function ProfileSettingScreen({ navigation }) {
   };
 
   return (
-    <AppBarView navigation={navigation}>
+    <AppBarView navigation={navigation} route={route}>
       <View style={{ marginLeft: 25, marginTop: 25 }}>
         <Text style={{ fontSize: 24, color: colors.textColor }}>
           Profile Settings
@@ -80,20 +80,24 @@ export default function ProfileSettingScreen({ navigation }) {
         style={styles.formContainer}
         showsVerticalScrollIndicator={false}
       >
-        {profileImage != "" ? (
+        {profileImage != "" && profileImage != null ? (
           <TouchableOpacity onPress={handleImageSelection}>
             <Image style={styles.imageViewer} source={{ uri: profileImage }} />
-            <Feather
-              name="edit"
-              size={24}
-              color="black"
+            {/* <View
               style={{
                 position: "absolute",
                 alignSelf: "center",
                 top: "40%",
-                opacity: 0.5,
+                opacity: 1,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-            />
+            > */}
+            {/* <Feather name="edit" size={24} color="black" /> */}
+            <Text style={{ alignSelf: "center", marginTop: 5 }}>
+              Tap on image to change it
+            </Text>
+            {/* </View> */}
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleImageSelection}>

@@ -5,7 +5,7 @@ import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 import { filterBatonsData } from "../utilities/filterBatonsData";
 
-export default function DeleteBatonScreen({ navigation }) {
+export default function DeleteBatonScreen({ navigation, route }) {
   const { batonsData, isLogin } = useUser();
   const [deletedBatons, setDeletedBatons] = useState([]);
 
@@ -15,7 +15,7 @@ export default function DeleteBatonScreen({ navigation }) {
   }, [batonsData]);
 
   return (
-    <AppBarView navigation={navigation}>
+    <AppBarView navigation={navigation} route={route}>
       <ScrollView style={{ marginTop: 15, paddingLeft: 15, paddingRight: 15 }}>
         <BatonAccordian
           title={"Deleted Batons"}

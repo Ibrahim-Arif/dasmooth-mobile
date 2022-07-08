@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView, Platform, StyleSheet } from "react-native";
 import { Appbar } from "react-native-paper";
 
-export default function AppBarView({ navigation, children }) {
+export default function AppBarView({ navigation, route, children }) {
   return (
     <SafeAreaView style={styles.container}>
       <Appbar style={{ justifyContent: "space-between" }}>
@@ -14,7 +14,15 @@ export default function AppBarView({ navigation, children }) {
           onPress={() => navigation.openDrawer()}
         />
         <Appbar.Content title="LOGO" style={{ alignSelf: "center" }} />
-        <Appbar.Action icon="magnify" onPress={() => {}} />
+        <Appbar.Action
+          icon="magnify"
+          onPress={() => {
+            if (route.name != "Dashboard") {
+              navigation.navigate("Dashboard");
+            }
+            // console.log(route.name);
+          }}
+        />
       </Appbar>
       {children}
     </SafeAreaView>

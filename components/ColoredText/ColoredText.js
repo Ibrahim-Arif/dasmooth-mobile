@@ -7,6 +7,7 @@ export default function ColoredText({
   underLine = false,
   fontSize = 18,
   onPress = () => null,
+  visible = true,
   children,
 }) {
   return (
@@ -18,6 +19,7 @@ export default function ColoredText({
         textDecorationLine: underLine ? "underline" : "none",
       }}
       onPress={onPress}
+      visible={visible}
     >
       {children}
     </Text>

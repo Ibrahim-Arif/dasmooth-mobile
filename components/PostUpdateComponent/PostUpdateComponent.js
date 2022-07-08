@@ -45,6 +45,7 @@ export default function PostUpdateComponent({
       };
 
       setText("");
+      setSelectedItem("some update added");
       handleAddPostUpdate(data)
         .then(() => {
           toast.show("Post Update Successfully", {

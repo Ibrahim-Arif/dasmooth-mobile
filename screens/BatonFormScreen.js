@@ -8,6 +8,7 @@ import {
   Menu,
   TextInput,
 } from "react-native-paper";
+
 import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
 import { useToast } from "react-native-toast-notifications";
 import { v4 } from "uuid";
@@ -19,13 +20,17 @@ import { colors } from "../utilities/colors";
 import { useUser } from "../hooks/useContext";
 import {
   handleAddBaton,
+  handleAddNotification,
   handleDeleteBaton,
   handleGetBatonFiles,
   handleUpdateBaton,
 } from "../services";
 import logResponse from "../utilities/logger";
+import { StackActions } from "@react-navigation/native";
 
-export default function DashboardScreen({ route, navigation }) {
+const popAction = StackActions.pop(1);
+
+export default function BatonFormScreen({ route, navigation }) {
   const { batonId } = route.params;
   const { batonsData, isLogin } = useUser();
   const toast = useToast();
@@ -126,6 +131,7 @@ export default function DashboardScreen({ route, navigation }) {
       setLoading(true);
 
       // console.log("Adding new post");
+
       handleAddBaton(post, id)
         .then((docId) => {
           handleAddNotification({
@@ -252,30 +258,37 @@ export default function DashboardScreen({ route, navigation }) {
     ]);
   };
 
-  useEffect(
-    () =>
-      setFilesList({
-        filesList: uploadedFiles,
-        text: `${uploadedFiles.length} files attached`,
-      }),
-    [uploadedFiles]
-  );
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) {
+      if (batonId != null)
+        setFilesList({
+          filesList: uploadedFiles,
+          text: `${uploadedFiles.length} files attached`,
+        });
+    }
+    return () => (isMounted = false);
+  }, [uploadedFiles]);
 
   useEffect(() => {
-    if (
-      dateData != "Set a deadline" &&
-      budgetData != "Set a budget" &&
-      teamMemberData != "Select a team member" &&
-      title != "" &&
-      description != ""
-    )
-      setDisabled(false);
-    else setDisabled(true);
+    let isMounted = true;
+    if (isMounted) {
+      if (
+        dateData != "Set a deadline" &&
+        budgetData != "Set a budget" &&
+        teamMemberData != "Select a team member" &&
+        title != "" &&
+        description != ""
+      )
+        setDisabled(false);
+      else setDisabled(true);
+    }
+    return () => (isMounted = false);
   }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
 
   useEffect(() => {
     // console.log("BatonFormScreen Line 76: batonID", batonId);
-    logResponse("info", "BatonFormScreen Line 208: batonID: " + batonId);
+    logResponse("info", "BatonFormScreen Line 278: Params batonID: " + batonId);
 
     if (batonId != null) {
       setFetchingLoading(true);
@@ -293,9 +306,9 @@ export default function DashboardScreen({ route, navigation }) {
       // if baton status is passed or received and memberId is same as logged in user,
       // then it means that the user is not the owner of the baton and cannot edit it
       if (
-        filter.authorPostStatus == "passed" ||
-        (filter.memberPostStatus == "received" &&
-          filter.memberId == isLogin.uid)
+        (filter.authorPostStatus == "passed" ||
+          filter.memberPostStatus == "received") &&
+        filter.memberId == isLogin.uid
       )
         setIsEditable(false);
 
@@ -328,7 +341,8 @@ export default function DashboardScreen({ route, navigation }) {
       setIsNewPost(true);
       flushData();
     }
-  }, []);
+    // logResponse("info", "Baton ID:" + id);
+  }, [batonId]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -346,10 +360,11 @@ export default function DashboardScreen({ route, navigation }) {
           >
             <IconButton
               icon="arrow-left"
-              onPress={() =>
-                isDeleted
-                  ? navigation.navigate("DeleteBatons")
-                  : navigation.navigate("DashboardMain")
+              onPress={
+                () => navigation.dispatch(popAction)
+                // isDeleted
+                //   ? navigation.navigate("Deleted Batons")
+                //   : navigation.navigate("DashboardMain")
               }
               size={26}
             />
@@ -507,13 +522,13 @@ export default function DashboardScreen({ route, navigation }) {
             <Selectable
               bgColor={colors.tealLight90}
               icon={<Avatar.Icon size={40} icon="attachment" />}
-              isActive={filesList.filesList.length > 0}
+              isActive={filesList.filesList.length > 0 || batonId != null}
               onPress={() =>
                 !isDeleted &&
                 navigation.navigate("FileSelection", {
                   setSelectedItem: (e) => setFilesList(e),
                   selectedItem: filesList,
-                  batonId: batonId,
+                  batonId: id,
                 })
               }
             >

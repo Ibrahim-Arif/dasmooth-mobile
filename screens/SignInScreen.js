@@ -17,10 +17,12 @@ import { handleSignIn } from "../services/handleSignIn";
 import { colors } from "../utilities/colors";
 import { heights, widths } from "../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
+import { useUser } from "../hooks/useContext";
 
 export default function SignInScreen({ navigation }) {
   const [isFieldActive, setIsFieldActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { setIsLogin } = useUser();
 
   const toast = useToast();
 
@@ -47,9 +49,17 @@ export default function SignInScreen({ navigation }) {
   const handleLoginClick = (email, password) => {
     setIsLoading(true);
     handleSignIn(email, password)
-      .then(() => {
+      .then((user) => {
+        if (user.emailVerified) {
+          setIsLogin(user);
+          navigation.navigate("Main");
+        } else {
+          toast.show("Please verify your email and try again", {
+            type: "warning",
+            style: { height: 50 },
+          });
+        }
         setIsLoading(false);
-        navigation.navigate("Main");
       })
       .catch((ex) => {
         setIsLoading(false);

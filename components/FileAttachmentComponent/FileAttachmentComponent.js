@@ -66,7 +66,7 @@ export default function FileAttachmentComponent({
         batonId: batonId,
         fileName: imageData.filesList[i].fileName,
       };
-
+      setImageData({ filesList: [] });
       handleAddBatonFiles(imagesData)
         .then(() => {
           // generateNotification("success", "Images uploaded successfully");
@@ -75,6 +75,7 @@ export default function FileAttachmentComponent({
             style: { height: 50 },
           });
           setUploading(false);
+
           closeScreen();
           // clickOk();
         })
@@ -121,9 +122,9 @@ export default function FileAttachmentComponent({
       <TouchableNativeFeedback onPress={pickImage}>
         <View style={styles.dragDropContainer}>
           <AntDesign name="inbox" size={45} color={colors.teal100} />
-          <ColoredText>Drag and drop here</ColoredText>
-          <ColoredText>or</ColoredText>
-          <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText>
+          <ColoredText>Tap to browse the files</ColoredText>
+          {/* <ColoredText>or</ColoredText>
+          <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText> */}
         </View>
       </TouchableNativeFeedback>
       <ScrollView
@@ -131,57 +132,73 @@ export default function FileAttachmentComponent({
         style={{ height: heights.height20p }}
         // endFillColor={colors.tealLight90}
       >
-        <View style={{ marginTop: 15 }}>
-          {imageData.filesList &&
-            imageData.filesList.map((e, index) => (
-              <Selectable
-                key={index}
-                isActive={false}
-                bgColor={colors.tealLight95}
-                onPress={() => handleRemoveFile(index)}
-                icon={
-                  <AntDesign name="delete" size={12} color={colors.teal100} />
-                }
-                style={{ height: 35 }}
-                contentStyle={{ height: 35 }}
-              >
-                {e.fileName}
-              </Selectable>
-            ))}
-        </View>
-        <View style={{ marginTop: 15 }}>
-          {uploadedFiles.map((e, index) => (
-            <Selectable
-              key={index}
-              isActive={false}
-              bgColor={colors.tealLight95}
-              // onPress={() => handleRemoveFile(index)}
-              icon={
-                <AntDesign name="download" size={12} color={colors.teal100} />
-              }
-              style={{ height: 35 }}
-              contentStyle={{ height: 35 }}
-            >
-              {e.fileName}
-            </Selectable>
-          ))}
-        </View>
+        {!uploading && (
+          <>
+            <View style={{ marginTop: 15 }}>
+              {imageData.filesList &&
+                imageData.filesList.map((e, index) => (
+                  <Selectable
+                    key={index}
+                    isActive={false}
+                    bgColor={colors.tealLight95}
+                    onPress={() => handleRemoveFile(index)}
+                    icon={
+                      <AntDesign
+                        name="delete"
+                        size={12}
+                        color={colors.teal100}
+                      />
+                    }
+                    style={{ height: 35 }}
+                    contentStyle={{ height: 35 }}
+                  >
+                    {e.fileName}
+                  </Selectable>
+                ))}
+            </View>
+            <View style={{ marginTop: 15 }}>
+              {uploadedFiles.map((e, index) => (
+                <Selectable
+                  key={index}
+                  isActive={false}
+                  bgColor={colors.tealLight95}
+                  // onPress={() => handleRemoveFile(index)}
+                  icon={
+                    <AntDesign
+                      name="download"
+                      size={12}
+                      color={colors.teal100}
+                    />
+                  }
+                  style={{ height: 35 }}
+                  contentStyle={{ height: 35 }}
+                >
+                  {e.fileName}
+                </Selectable>
+              ))}
+            </View>
+          </>
+        )}
       </ScrollView>
+      {/* [2022-07-08] if we are in uploading state we will not show the files count */}
 
-      <ColoredText color="teal" style={styles.attachFileText}>
-        {uploadedFiles.length} files attached
-      </ColoredText>
+      {!uploading && (
+        <ColoredText color="teal" style={styles.attachFileText}>
+          {imageData.filesList.length > 0
+            ? imageData.filesList.length + uploadedFiles.length
+            : uploadedFiles.length}{" "}
+          files attached
+        </ColoredText>
+      )}
+
       <View style={styles.tealButtonContainer}>
         {uploading ? (
-          <ActivityIndicator />
+          <ActivityIndicator size={40} />
         ) : (
           <TealButton
             text="Upload"
             style={{ width: 285 }}
-            onPress={
-              handleUpload
-              // setSelectedItem(imageData);
-            }
+            onPress={handleUpload}
           />
         )}
       </View>
