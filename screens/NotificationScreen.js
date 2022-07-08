@@ -7,7 +7,7 @@ import { colors } from "../utilities/colors";
 
 export default function NotificationScreen({ navigation, route }) {
   const { notifications } = useUser();
-
+  // console.log(notifications);
   return (
     <AppBarView navigation={navigation} route={route}>
       <View
@@ -25,6 +25,7 @@ export default function NotificationScreen({ navigation, route }) {
               description={item.description}
               type={item.type}
               style={{ marginBottom: 15 }}
+              id={item.docId}
             />
           ))}
         </ScrollView>

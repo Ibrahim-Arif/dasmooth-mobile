@@ -1,9 +1,12 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 
+import { handleUpdateNotificationStatus } from "../../services";
+
 export default function Alert({
+  id,
   message = "Lorem",
   description = "Lorem Ipsum",
   type,
@@ -13,13 +16,13 @@ export default function Alert({
     switch (type) {
       case "success":
         return colors.successBg;
-        break;
+
       case "danger":
         return colors.dangerBg;
-        break;
+
       case "warning":
         return colors.warningBg;
-        break;
+
       default:
         break;
     }
@@ -41,7 +44,16 @@ export default function Alert({
     >
       <AntDesign name="checkcircleo" size={24} color={colors.success} />
       <View style={{ marginLeft: 15, paddingRight: 25 }}>
-        <Text>{message}</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text>{message}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              handleUpdateNotificationStatus(id, true);
+            }}
+          >
+            <AntDesign name="close" size={20} />
+          </TouchableOpacity>
+        </View>
         <Text style={{ marginTop: 10, textAlign: "left" }}>{description}</Text>
       </View>
     </View>
