@@ -61,6 +61,7 @@ function CustomDrawerContent(props) {
         <PaperDrawer.Section style={styles.drawerSection}>
           <DrawerItemList {...props} />
           <DrawerItem
+            inactiveTintColor={colors.teal100}
             icon={({ color, focused, size }) => (
               <AntDesign name="logout" size={size} color={colors.teal100} />
             )}
@@ -83,9 +84,14 @@ export default function DrawerNavigation() {
       initialRouteName="Dashboard"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
-        // drawerActiveTintColor: colors.teal100,
-        // title: "Dashboard",
         headerShown: false,
+        drawerStyle: {
+          backgroundColor: colors.tealLight90,
+        },
+        drawerActiveBackgroundColor: "white",
+        drawerInactiveTintColor: colors.teal100,
+        // drawerItemStyle: { width: "100%", padding: 0, margin: 0 },
+        // drawerContentStyle: { width: "100%", padding: 0 },
       }}
     >
       <Drawer.Screen
