@@ -21,6 +21,7 @@ export default function FileAttachmentComponent({
   const [imageData, setImageData] = useState({ filesList: [] });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadCount, setUploadCount] = useState(0);
   const toast = useToast();
 
   const pickImage = async () => {
@@ -75,8 +76,8 @@ export default function FileAttachmentComponent({
             style: { height: 50 },
           });
           setUploading(false);
+          setUploadCount(uploadCount + 1);
 
-          closeScreen();
           // clickOk();
         })
         .catch((ex) => {
@@ -88,6 +89,7 @@ export default function FileAttachmentComponent({
           setUploading(false);
         });
     }
+    // closeScreen();
   };
 
   useEffect(() => {

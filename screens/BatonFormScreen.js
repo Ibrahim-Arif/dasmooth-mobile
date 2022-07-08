@@ -306,9 +306,9 @@ export default function BatonFormScreen({ route, navigation }) {
       // if baton status is passed or received and memberId is same as logged in user,
       // then it means that the user is not the owner of the baton and cannot edit it
       if (
-        (filter.authorPostStatus == "passed" ||
-          filter.memberPostStatus == "received") &&
-        filter.memberId == isLogin.uid
+        filter.authorPostStatus == "passed" ||
+        (filter.memberPostStatus == "received" &&
+          filter.memberId == isLogin.uid)
       )
         setIsEditable(false);
 
