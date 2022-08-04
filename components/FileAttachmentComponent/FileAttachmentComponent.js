@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TouchableNativeFeedback, View } from "react-native";
+import { Image, StyleSheet, TouchableNativeFeedback, View } from "react-native";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
 import ColoredText from "../ColoredText/ColoredText";
 import TealButton from "../TealButton/TealButton";
@@ -8,9 +10,10 @@ import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 import { ScrollView } from "react-native-gesture-handler";
 import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
-import { ActivityIndicator } from "react-native-paper";
-import { heights } from "../../utilities/sizes";
+import { ActivityIndicator, Modal } from "react-native-paper";
+import { heights, widths } from "../../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
+import logResponse from "../../utilities/logger";
 
 export default function FileAttachmentComponent({
   selectedItem,
@@ -21,8 +24,14 @@ export default function FileAttachmentComponent({
   const [imageData, setImageData] = useState({ filesList: [] });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [selectedImageToView, setSelectedImageToView] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState(0);
   const toast = useToast();
+  const [status, requestPermission] = MediaLibrary.usePermissions();
+
+  const showModal = () => setIsVisible(true);
+  const hideModal = () => setIsVisible(false);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -58,6 +67,7 @@ export default function FileAttachmentComponent({
       toast.show("Baton Id is null", { type: "danger" });
       return;
     }
+    if (imageData.filesList.length == 0) return;
     setUploading(true);
     for (let i = 0; i < imageData.filesList.length; i++) {
       // var reader = new FileReader();
@@ -92,6 +102,36 @@ export default function FileAttachmentComponent({
     // closeScreen();
   };
 
+  const handleSaveImageToGallery = async (file) => {
+    try {
+      if (status !== "granted") {
+        requestPermission();
+
+        const filename = FileSystem.documentDirectory + file.fileName;
+        await FileSystem.writeAsStringAsync(filename, file.image, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+
+        toast.show(file.fileName + " saved to gallery", {
+          type: "success",
+        });
+      } else {
+        const filename = FileSystem.documentDirectory + file.fileName;
+        await FileSystem.writeAsStringAsync(filename, file.image, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+
+        toast.show("Image saved to gallery", {
+          type: "info",
+          style: { height: 50 },
+        });
+      }
+    } catch (ex) {
+      logResponse("error", ex.message);
+    }
+  };
   useEffect(() => {
     return () => {
       // console.log(imageData);
@@ -99,7 +139,7 @@ export default function FileAttachmentComponent({
       if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
         setSelectedItem({
           filesList: [...imageData.filesList, ...uploadedFiles],
-          text: "Attach a file (Optional)",
+          text: "Attach a file",
         });
       // else there are some files which we want to send to the baton form screen
       // so that we can show the files length in the baton form screen
@@ -129,6 +169,7 @@ export default function FileAttachmentComponent({
           <ColoredText color="grey">BROWSE OR SELECT FILES</ColoredText> */}
         </View>
       </TouchableNativeFeedback>
+
       <ScrollView
         bounces={false}
         style={{ height: heights.height20p }}
@@ -164,7 +205,11 @@ export default function FileAttachmentComponent({
                   key={index}
                   isActive={false}
                   bgColor={colors.tealLight95}
-                  // onPress={() => handleRemoveFile(index)}
+                  onPress={() => {
+                    handleSaveImageToGallery(e);
+                    // setSelectedImageToView(e.image);
+                    // setIsVisible(true);
+                  }}
                   icon={
                     <AntDesign
                       name="download"
@@ -204,7 +249,29 @@ export default function FileAttachmentComponent({
           />
         )}
       </View>
-      <View style={{ height: 50 }}></View>
+      {/* <View style={{ height: 50 }}></View> */}
+      {/* <Modal
+        visible={isVisible}
+        onDismiss={hideModal}
+        style={{
+          // backgroundColor: "white",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 500,
+        }}
+      >
+        <View
+          style={{
+            width: widths.width90p,
+            height: heights.height50p,
+          }}
+        >
+          <Image
+            source={{ uri: `data:image/gif;base64,${selectedImageToView}` }}
+            style={{ width: "100%", height: "100%" }}
+          />
+        </View> */}
+      {/* </Modal> */}
     </View>
   );
 }

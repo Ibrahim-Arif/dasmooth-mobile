@@ -3,11 +3,11 @@ import { LogBox } from "react-native";
 import { registerRootComponent } from "expo";
 import { StackNavigaiton } from "./navigation/StackNavigation";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
+import { AntDesign } from "@expo/vector-icons";
 import { ToastProvider } from "react-native-toast-notifications";
 import { colors } from "./utilities/colors";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./config/firebaseConfig";
-import { AntDesign } from "@expo/vector-icons";
 import { StateProvider } from "./hooks/useContext";
 import { batonsList } from "./utilities/batonsList";
 import {

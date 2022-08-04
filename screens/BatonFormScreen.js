@@ -56,7 +56,7 @@ export default function BatonFormScreen({ route, navigation }) {
   const [budgetData, setBudgetData] = useState("Set a budget");
   const [postUpdateData, setPostUpdateData] = useState("");
   const [filesList, setFilesList] = useState({
-    text: "Attach a file (Optional)",
+    text: "Attach a file",
     filesList: [],
   });
 
@@ -439,7 +439,7 @@ export default function BatonFormScreen({ route, navigation }) {
             />
             <TextInput
               style={{ marginTop: 5 }}
-              placeholder="Add Desctiprion"
+              placeholder="Add  Description"
               placeholderTextColor="black"
               onChangeText={(e) => setDescription(e)}
               mode="outlined"
