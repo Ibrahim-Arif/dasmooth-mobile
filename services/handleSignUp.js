@@ -23,7 +23,10 @@ export const handleSignUp = async (
     );
 
     if (isInvite) await handleForgotPassword(userCredential.user.email);
-    else await sendEmailVerification(userCredential.user);
+    else
+      await sendEmailVerification(userCredential.user, {
+        url: "https://dasmooth-project.web.app/signin",
+      });
 
     await handleAddUserToDatabase(userCredential.user);
     return userCredential.user;

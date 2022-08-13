@@ -7,7 +7,7 @@ import {
 } from "firebase/firestore";
 export const handleGetNotifications = async (uid, setData) => {
   try {
-    console.log(uid);
+    // console.log(uid);
     const db = getFirestore();
     const q = query(
       collection(db, "notifications"),

@@ -8,9 +8,9 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { firebaseAuthErrors } from "../utilities/errors";
+import { handleAddNotification } from "./handleAddNotification";
+import { handleAddTeamMember } from "./handleAddTeamMember";
 import { handleUpdateBatonStatus } from "./handleUpdateBatonStatus";
-
 export const handleSignIn = async (email, password) => {
   try {
     const auth = getAuth();
@@ -41,7 +41,7 @@ export const handleSignIn = async (email, password) => {
           );
 
           onSnapshot(q, (querySnapshot) => {
-            console.log("doc Size:", querySnapshot.size);
+            // console.log("doc Size:", querySnapshot.size);
             querySnapshot.forEach(async (batonDocument) => {
               // updating member status
               await handleUpdateBatonStatus(
@@ -69,8 +69,10 @@ export const handleSignIn = async (email, password) => {
     });
     return userCredential.user;
   } catch (ex) {
-    // console.log(ex.code);
-    ex.message = firebaseAuthErrors[ex.code];
+    if (ex.code == "auth/user-not-found")
+      ex.message = "No user found with this email";
+    else if (ex.code == "auth/wrong-password") ex.message = "Wrong password";
+    // console.log(ex.code)
     throw new Error(ex.message);
   }
 };

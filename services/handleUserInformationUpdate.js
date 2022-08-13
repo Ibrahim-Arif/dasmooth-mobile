@@ -12,6 +12,7 @@ export const handleUserInformationUpdate = async (
     if (photoURL == null) photoURL = "";
     if (!photoURL.includes("https://") && photoURL != "") {
       const url = await uploadImageAsync(photoURL);
+      URL.revokeObjectURL(photoURL);
       photoURL = url;
     }
     // console.log(photoURL);
@@ -20,9 +21,10 @@ export const handleUserInformationUpdate = async (
       displayName: displayName,
       photoURL: photoURL,
     });
+
     return photoURL;
   } catch (ex) {
-    console.log(ex);
+    // console.log(ex);
     throw new Error(ex);
   }
 };
