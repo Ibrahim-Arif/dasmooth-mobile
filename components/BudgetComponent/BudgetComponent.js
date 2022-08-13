@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, Platform } from "react-native";
+import { View, Text } from "react-native";
 import { TextInput, Checkbox } from "react-native-paper";
 import { colors } from "../../utilities/colors";
 import TealButton from "../TealButton/TealButton";
@@ -29,21 +29,12 @@ export default function BudgetComponent({
       <View
         style={{ flexDirection: "row", alignItems: "center", marginTop: 15 }}
       >
-        {Platform.OS == "ios" ? (
-          <Checkbox.IOS
-            onPress={() => (text != "N/A" ? setText("N/A") : setText("0"))}
-            status={text == "N/A" ? "checked" : "unchecked"}
-            color={colors.teal100}
-            uncheckedColor="#808080"
-          />
-        ) : (
-          <Checkbox
-            onPress={() => (text != "N/A" ? setText("N/A") : setText("0"))}
-            status={text == "N/A" ? "checked" : "unchecked"}
-            color={colors.teal100}
-            uncheckedColor="#808080"
-          />
-        )}
+        <Checkbox.Android
+          onPress={() => (text != "N/A" ? setText("N/A") : setText("0"))}
+          status={text == "N/A" ? "checked" : "unchecked"}
+          color={colors.teal100}
+          uncheckedColor="#808080"
+        />
 
         <Text>N/A</Text>
       </View>
