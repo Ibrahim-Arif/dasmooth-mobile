@@ -103,12 +103,18 @@ export default function FileAttachmentComponent({
   };
 
   const handleSaveImageToGallery = async (file) => {
+    let image = "";
     try {
       if (status !== "granted") {
         requestPermission();
-
+        console.log(file.image);
         const filename = FileSystem.documentDirectory + file.fileName;
-        await FileSystem.writeAsStringAsync(filename, file.image, {
+
+        if (file.image.includes("data:image/png;base64,"))
+          image = file.image.replace("data:image/png;base64,", "");
+        else image = file.image;
+
+        await FileSystem.writeAsStringAsync(filename, image, {
           encoding: FileSystem.EncodingType.Base64,
         });
         const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
