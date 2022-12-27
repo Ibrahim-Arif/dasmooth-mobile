@@ -453,17 +453,13 @@ export default function BatonFormScreen({ route, navigation }) {
             />
             <Selectable
               style={{ marginTop: 25 }}
-              bgColor={colors.tealLight90}
-              icon={
-                <Avatar.Text
-                  size={36}
-                  style={{
-                    backgroundColor: batonId != null ? "white" : colors.teal100,
-                    color: batonId == null ? "white" : colors.teal100,
-                  }}
-                  label={teamMemberData.text.substring(0, 2).toUpperCase()}
-                />
+              bgColor={colors.azure}
+              isEditable={
+                batonId != null || teamMemberData.text != "Select a team member"
+                  ? true
+                  : false
               }
+              text={teamMemberData.text.substring(0, 2).toUpperCase()}
               isActive={teamMemberData.text != "Select a team member"}
               onPress={() =>
                 isEditable &&
@@ -475,15 +471,14 @@ export default function BatonFormScreen({ route, navigation }) {
             >
               {teamMemberData.text}
             </Selectable>
+
             <Selectable
-              bgColor={colors.tealLight90}
-              icon={
-                <Avatar.Icon
-                  size={40}
-                  icon={({ color, size }) => (
-                    <AntDesign name="calendar" size={size} color={color} />
-                  )}
-                />
+              bgColor={colors.azure}
+              icon={({ size, color }) => (
+                <AntDesign name="calendar" size={size} color={color} />
+              )}
+              isEditable={
+                batonId != null || dateData != "Set a deadline" ? true : false
               }
               isActive={dateData != "Set a deadline"}
               onPress={() =>
@@ -497,16 +492,15 @@ export default function BatonFormScreen({ route, navigation }) {
             >
               {dateData}
             </Selectable>
+
             <Selectable
-              bgColor={colors.tealLight90}
-              icon={
-                <Avatar.Icon
-                  size={40}
-                  icon={({ color, size }) => (
-                    <FontAwesome name="dollar" size={size} color={color} />
-                  )}
-                />
+              isEditable={
+                batonId != null || budgetData != "Set a budget" ? true : false
               }
+              bgColor={colors.azure}
+              icon={({ color, size }) => (
+                <FontAwesome name="dollar" size={size} color={color} />
+              )}
               onPress={() =>
                 isEditable &&
                 !isDeleted &&
@@ -519,10 +513,16 @@ export default function BatonFormScreen({ route, navigation }) {
             >
               {budgetData}
             </Selectable>
+
             <Selectable
-              bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="attachment" />}
-              isActive={filesList.filesList.length > 0 || batonId != null}
+              isEditable={
+                filesList.filesList.length > 0 || batonId != null ? true : false
+              }
+              bgColor={colors.azure}
+              icon="attachment"
+              isActive={
+                filesList.filesList.length > 0 || batonId != null ? true : false
+              }
               onPress={() =>
                 !isDeleted &&
                 navigation.navigate("FileSelection", {
@@ -537,9 +537,13 @@ export default function BatonFormScreen({ route, navigation }) {
               : "Attach a file (Optional)"} */}
               {filesList.text}
             </Selectable>
+
             <Selectable
-              bgColor={colors.tealLight90}
-              icon={<Avatar.Icon size={40} icon="post" />}
+              isEditable={
+                postUpdateData != "" || batonId != null ? true : false
+              }
+              bgColor={colors.azure}
+              icon="post"
               onPress={() =>
                 !isDeleted &&
                 navigation.navigate("PostUpdateSelection", {
@@ -552,6 +556,7 @@ export default function BatonFormScreen({ route, navigation }) {
             >
               Post an update
             </Selectable>
+
             <View style={{ marginTop: 15 }}>
               {loading ? (
                 <ActivityIndicator size={26} />

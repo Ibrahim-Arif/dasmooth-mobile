@@ -151,7 +151,10 @@ export default function DashboardScreen({ navigation }) {
                 height: 40,
                 borderRadius: 20,
                 elevation: 0,
+                color: "black",
               }}
+              inputStyle={{ color: colors["37474f"] }}
+              iconColor={colors["5f6b72"]}
             />
           ) : (
             <View>
@@ -192,7 +195,7 @@ export default function DashboardScreen({ navigation }) {
               ListFooterComponent={<View style={{ height: 100 }}></View>}
               data={activeBatons}
               onDragEnd={({ data }) => setBatons(data)}
-              keyExtractor={(item) => item.title}
+              keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, drag, isActive }) =>
                 renderItem(
                   { item, drag, isActive },

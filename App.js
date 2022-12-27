@@ -24,7 +24,7 @@ const theme = {
   roundness: 2,
   colors: {
     ...DefaultTheme.colors,
-    primary: colors.teal100,
+    primary: colors.mosque,
   },
 };
 initializeApp(firebaseConfig);

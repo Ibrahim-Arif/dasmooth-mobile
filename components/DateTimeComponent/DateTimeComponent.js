@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Platform, StyleSheet } from "react-native";
+import { View, Platform, StyleSheet, Text } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CalendarPicker from "react-native-calendar-picker/CalendarPicker";
 import moment from "moment";
@@ -22,15 +22,15 @@ export default function DateTimeComponent({
 
   return (
     <View style={styles.componentContainer}>
-      <Selectable
-        bgColor={colors.teal100}
-        isActive={true}
-        style={styles.dateSelectableContainer}
-        contentStyle={{ height: 40 }}
-        icon={null}
+      <View
+        style={[
+          styles.dateSelectableContainer,
+          { backgroundColor: colors.mosque },
+        ]}
       >
-        {date}
-      </Selectable>
+        <Text style={{ color: colors.white, fontSize: 14 }}>{date}</Text>
+      </View>
+
       <View style={styles.dateTimeComponentContainer}>
         <CalendarPicker
           onDateChange={(value) => {
@@ -67,7 +67,7 @@ export default function DateTimeComponent({
             isActive={true}
             style={styles.selectable}
             contentStyle={{ height: 40 }}
-            icon={null}
+            icon="clock"
             onPress={() => setTimePickerVisibility(true)}
           >
             {moment(time).format("hh:mm A").toString()}
@@ -110,18 +110,20 @@ export default function DateTimeComponent({
 const styles = StyleSheet.create({
   componentContainer: { alignItems: "center", padding: 20 },
   selectable: {
-    alignItems: "center",
-    height: 40,
+    height: 50,
     marginTop: 25,
-    width: 250,
+    width: 150,
     alignSelf: "center",
   },
   dateSelectableContainer: {
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
+    height: 50,
+    width: "100%",
+    borderRadius: 5,
   },
   dateTimeComponentContainer: {
     // justifyContent: "center",
+    marginTop: 15,
   },
 });

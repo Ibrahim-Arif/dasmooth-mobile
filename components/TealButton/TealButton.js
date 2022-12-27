@@ -15,24 +15,39 @@ export default function TealButton({
       icon={icon}
       mode="contained"
       onPress={onPress}
-      style={{
-        // backgroundColor: colors.teal100,
-        backgroundColor: disabled ? colors.grey100 : colors.teal100,
-        // borderColor: colors.grey100,
-        // borderWidth: 0.1,
-        alignItems: "center",
-        justifyContent: "center",
-        width: Dimensions.get("screen").width * 0.9,
-        height: 60,
-        borderRadius: 5,
-        ...style,
+      style={[
+        {
+          // backgroundColor: colors.teal100,
+          backgroundColor: disabled ? colors.disabled : colors.mosque,
+          borderColor: colors.gray40,
+          borderWidth: disabled ? 1 : 0,
+          alignItems: "center",
+          justifyContent: "center",
+          width: Dimensions.get("screen").width * 0.9,
+          height: 60,
+          borderRadius: 5,
+          color: colors.white,
+          ...style,
+        },
+        !disabled && {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 4,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 6,
+          elevation: 5,
+        },
+      ]}
+      labelStyle={{
+        color: colors.white,
       }}
       disabled={disabled}
       contentStyle={{
         width: Dimensions.get("screen").width * 0.9,
         height: 60,
         borderRadius: 5,
-
         ...style,
       }}
     >

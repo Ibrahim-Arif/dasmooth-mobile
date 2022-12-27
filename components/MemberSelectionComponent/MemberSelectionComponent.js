@@ -281,9 +281,10 @@ export default function MemberSelectionComponent({
         value={searchText}
       />
       <Selectable
-        icon={<AntDesign name="plus" size={24} color={colors.teal100} />}
+        icon="plus"
+        iconBgColor="transparent"
+        iconColor={colors.mosque}
         isActive={false}
-        bgColor={colors.cgLight95}
         style={{ marginTop: 10 }}
         onPress={() => {
           setInviteMode(true);
@@ -304,27 +305,7 @@ export default function MemberSelectionComponent({
         {membersList.map((e, index) => (
           <Selectable
             key={index}
-            icon={
-              // e.photoURL != undefined ? (
-              //   <Avatar.Image
-              //     source={{
-              //       uri: e.photoURL,
-              //     }}
-              //     size={36}
-              //     style={{ overflow: "hidden" }}
-              //   />
-              // ) : (
-              <Avatar.Text
-                size={36}
-                style={{
-                  backgroundColor:
-                    e.name == member.text ? "white" : colors.teal100,
-                  color: e.name != member.text ? "white" : colors.teal100,
-                }}
-                label={e.name.substring(0, 2).toUpperCase()}
-              />
-              // )
-            }
+            text={e.name.substring(0, 2).toUpperCase()}
             onPress={() => {
               if (!formMode) {
                 setInviteMode(false);
@@ -350,7 +331,7 @@ export default function MemberSelectionComponent({
                 });
               }
             }}
-            bgColor={colors.tealLight90}
+            // bgColor={colors.tealLight90}
             isActive={formMode ? e.name == member.text : false}
           >
             {e.name}

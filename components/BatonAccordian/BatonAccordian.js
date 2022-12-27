@@ -3,6 +3,7 @@ import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { List } from "react-native-paper";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
+import { v4 } from "uuid";
 
 export default function BatonAccordian({
   title = "Baton",
@@ -19,8 +20,41 @@ export default function BatonAccordian({
   const [pressed, setPressed] = React.useState(false);
   const dummy = ["First Item", "Second Item"];
 
+  const CustomListItem = ({ title, index, docId }) => {
+    const [focused, setFocused] = React.useState(false);
+    return (
+      <List.Item
+        key={index}
+        title={title}
+        style={[
+          {
+            borderWidth: 1,
+            borderTopColor: focused ? color : colors.white,
+            borderRightColor: focused ? color : colors.white,
+            borderBottomColor: focused ? color : colors.white,
+            borderLeftColor: color,
+          },
+          styles.listItem,
+        ]}
+        onPressIn={() => setFocused(true)}
+        onPressOut={() => setFocused(false)}
+        right={(props) => (
+          <List.Icon
+            {...props}
+            icon={() => <AntDesign name="right" size={24} color="black" />}
+          />
+        )}
+        // onPressIn={() => setPressed(true)}
+        // onPressOut={() => setPressed(false)}
+        onPress={() => {
+          navigation.navigate("BatonForm", { batonId: docId });
+        }}
+      />
+    );
+  };
+
   return (
-    <View style={{ backgroundColor: bgColor }}>
+    <View style={{ backgroundColor: bgColor, paddingBottom: 10 }}>
       <List.Accordion
         onLongPress={drag}
         title={`${title} (${listItems.length})`}
@@ -47,29 +81,7 @@ export default function BatonAccordian({
         onPress={() => setPressed(!pressed)}
       >
         {listItems.map((e, index) => (
-          <List.Item
-            key={index}
-            title={e.title}
-            style={[
-              styles.listItem,
-              { borderLeftColor: color },
-              {
-                borderBottomWidth: 4,
-                borderBottomColor: colors.textColor,
-              },
-            ]}
-            right={(props) => (
-              <List.Icon
-                {...props}
-                icon={() => <AntDesign name="right" size={24} color="black" />}
-              />
-            )}
-            // onPressIn={() => setPressed(true)}
-            // onPressOut={() => setPressed(false)}
-            onPress={() => {
-              navigation.navigate("BatonForm", { batonId: e.docId });
-            }}
-          />
+          <CustomListItem title={e.title} index={v4()} docId={e.docId} />
         ))}
       </List.Accordion>
     </View>
@@ -80,8 +92,17 @@ const styles = StyleSheet.create({
   listItem: {
     borderLeftWidth: 4,
     backgroundColor: "white",
-    borderRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
     margin: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 5,
   },
   accordion: { borderTopWidth: 3, color: "black", marginTop: 10 },
   titleStyle: { color: "black", fontWeight: "bold" },
