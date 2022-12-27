@@ -73,7 +73,7 @@ export default function NotificationScreen({ navigation, route }) {
     },
     {
       batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
-      date: 1651321231321,
+      date: 1651321231323,
       description: "You received a new Baton from Bilal",
       docId: "21kimbynhexPDlZhzSMm",
       message: "Baton Accepted",
@@ -91,11 +91,13 @@ export default function NotificationScreen({ navigation, route }) {
     let arrayForm = [];
 
     for (const item of notifications) {
-      const date = item.date;
-      if (groupObj[date]) {
-        groupObj[date].push(item);
+      const date = new Date(item.date);
+      const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      // console.log(dateKey);
+      if (groupObj[dateKey]) {
+        groupObj[dateKey].push(item);
       } else {
-        groupObj[date] = [item];
+        groupObj[dateKey] = [item];
       }
     }
 
@@ -127,9 +129,7 @@ export default function NotificationScreen({ navigation, route }) {
         >
           {sectionSortedNotifications.map((item, index) => (
             <View key={v4()} style={index > 0 ? { marginTop: 32 } : {}}>
-              <Text>
-                {moment(new Date(parseInt(item.date))).format("MMM DD, YYYY")}
-              </Text>
+              <Text>{moment(new Date(item.date)).format("MMM DD, YYYY")}</Text>
 
               {item.notifications?.map((notification, index) => (
                 <Alert
