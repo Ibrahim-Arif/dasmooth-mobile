@@ -26,6 +26,7 @@ import TealButton from "../TealButton/TealButton";
 import { useUser } from "../../hooks/useContext";
 import { useToast } from "react-native-toast-notifications";
 import ColoredText from "../ColoredText/ColoredText";
+import { v4 } from "uuid";
 
 export default function MemberSelectionComponent({
   setSelectedItem,
@@ -304,7 +305,7 @@ export default function MemberSelectionComponent({
       >
         {membersList.map((e, index) => (
           <Selectable
-            key={index}
+            key={v4()}
             text={e.name.substring(0, 2).toUpperCase()}
             onPress={() => {
               if (!formMode) {

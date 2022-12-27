@@ -14,6 +14,7 @@ import { ActivityIndicator, Modal } from "react-native-paper";
 import { heights, widths } from "../../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
 import logResponse from "../../utilities/logger";
+import { v4 } from "uuid";
 
 export default function FileAttachmentComponent({
   selectedItem,
@@ -187,7 +188,7 @@ export default function FileAttachmentComponent({
               {imageData.filesList &&
                 imageData.filesList.map((e, index) => (
                   <Selectable
-                    key={index}
+                    key={v4()}
                     isActive={false}
                     bgColor={colors.tealLight95}
                     onPress={() => handleRemoveFile(index)}
@@ -208,7 +209,7 @@ export default function FileAttachmentComponent({
             <View style={{ marginTop: 15 }}>
               {uploadedFiles.map((e, index) => (
                 <Selectable
-                  key={index}
+                  key={v4()}
                   isActive={false}
                   bgColor={colors.tealLight95}
                   onPress={() => {

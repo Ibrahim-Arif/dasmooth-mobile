@@ -1,6 +1,7 @@
 import moment from "moment";
 import React, { useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { v4 } from "uuid";
 import { AppBarView } from "../components";
 import Alert from "../components/Alert/Alert";
 import { useUser } from "../hooks/useContext";
@@ -125,14 +126,14 @@ export default function NotificationScreen({ navigation, route }) {
           showsVerticalScrollIndicator={false}
         >
           {sectionSortedNotifications.map((item, index) => (
-            <View key={index} style={index > 0 ? { marginTop: 32 } : {}}>
+            <View key={v4()} style={index > 0 ? { marginTop: 32 } : {}}>
               <Text>
                 {moment(new Date(parseInt(item.date))).format("MMM DD, YYYY")}
               </Text>
 
               {item.notifications?.map((notification, index) => (
                 <Alert
-                  key={index}
+                  key={v4()}
                   batonTitle={notification.message}
                   batonName={notification.message}
                   batonDescription={notification.description}

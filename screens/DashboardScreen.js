@@ -22,6 +22,7 @@ import { logo } from "../assets";
 import { useUser } from "../hooks/useContext";
 import { filterBatonsData } from "../utilities/filterBatonsData";
 import { batonsList } from "../utilities/batonsList";
+import { v4 } from "uuid";
 
 export default function DashboardScreen({ navigation }) {
   const {
@@ -195,7 +196,7 @@ export default function DashboardScreen({ navigation }) {
               ListFooterComponent={<View style={{ height: 100 }}></View>}
               data={activeBatons}
               onDragEnd={({ data }) => setBatons(data)}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(item, index) => v4().toString()}
               renderItem={({ item, drag, isActive }) =>
                 renderItem(
                   { item, drag, isActive },

@@ -18,43 +18,41 @@ export default function BatonAccordian({
   // const handlePress = () => setExpanded(!expanded);
 
   const [pressed, setPressed] = React.useState(false);
-  const dummy = ["First Item", "Second Item"];
-
-  const CustomListItem = ({ title, index, docId }) => {
+  const CustomListItem = ({ title, docId }) => {
     const [focused, setFocused] = React.useState(false);
     return (
-      <List.Item
-        key={index}
-        title={title}
-        style={[
-          {
-            borderWidth: 1,
-            borderTopColor: focused ? color : colors.white,
-            borderRightColor: focused ? color : colors.white,
-            borderBottomColor: focused ? color : colors.white,
-            borderLeftColor: color,
-          },
-          styles.listItem,
-        ]}
-        onPressIn={() => setFocused(true)}
-        onPressOut={() => setFocused(false)}
-        right={(props) => (
-          <List.Icon
-            {...props}
-            icon={() => <AntDesign name="right" size={24} color="black" />}
-          />
-        )}
-        // onPressIn={() => setPressed(true)}
-        // onPressOut={() => setPressed(false)}
-        onPress={() => {
-          navigation.navigate("BatonForm", { batonId: docId });
-        }}
-      />
+      <View key={v4()}>
+        <List.Item
+          title={title}
+          style={[
+            {
+              borderWidth: 1,
+              borderTopColor: focused ? color : colors.white,
+              borderRightColor: focused ? color : colors.white,
+              borderBottomColor: focused ? color : colors.white,
+              borderLeftColor: color,
+            },
+            styles.listItem,
+          ]}
+          onPressIn={() => setFocused(true)}
+          onPressOut={() => setFocused(false)}
+          right={(props) => (
+            <List.Icon
+              {...props}
+              icon={() => <AntDesign name="right" size={24} color="black" />}
+            />
+          )}
+          // onPressIn={() => setPressed(true)}
+          // onPressOut={() => setPressed(false)}
+          onPress={() => {
+            navigation.navigate("BatonForm", { batonId: docId });
+          }}
+        />
+      </View>
     );
   };
-
   return (
-    <View style={{ backgroundColor: bgColor, paddingBottom: 10 }}>
+    <View style={{ backgroundColor: bgColor }}>
       <List.Accordion
         onLongPress={drag}
         title={`${title} (${listItems.length})`}
@@ -81,7 +79,7 @@ export default function BatonAccordian({
         onPress={() => setPressed(!pressed)}
       >
         {listItems.map((e, index) => (
-          <CustomListItem title={e.title} index={v4()} docId={e.docId} />
+          <CustomListItem title={e.title} docId={e.docId} />
         ))}
       </List.Accordion>
     </View>
