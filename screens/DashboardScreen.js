@@ -197,8 +197,8 @@ export default function DashboardScreen({ navigation }) {
                 showsVerticalScrollIndicator={false}
                 ListFooterComponent={<View style={{ height: 100 }}></View>}
                 data={activeBatons}
-                onDragEnd={({ data }) => setBatons(data)}
-                keyExtractor={(item, index) => v4().toString()}
+                onDragEnd={({ data }) => setActiveBatons(data)}
+                keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, drag, isActive }) =>
                   renderItem(
                     { item, drag, isActive },
