@@ -10,7 +10,7 @@ export default function Selectable({
   icon = null,
   text = null,
   isActive = false,
-
+  batonType = null,
   isEditable = false,
   textColor = null,
   style,

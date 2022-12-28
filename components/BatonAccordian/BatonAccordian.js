@@ -34,8 +34,13 @@ export default function BatonAccordian({
             },
             styles.listItem,
           ]}
-          onPressIn={() => setFocused(true)}
-          onPressOut={() => setFocused(false)}
+          // onPressIn={() => {
+          //   setFocused(true);
+          // }}
+          // onPressOut={() => {
+          //   navigation.navigate("BatonForm", { batonId: docId });
+          //   setFocused(false);
+          // }}
           right={(props) => (
             <List.Icon
               {...props}
@@ -45,7 +50,9 @@ export default function BatonAccordian({
           // onPressIn={() => setPressed(true)}
           // onPressOut={() => setPressed(false)}
           onPress={() => {
+            setFocused(true);
             navigation.navigate("BatonForm", { batonId: docId });
+            setFocused(false);
           }}
         />
       </View>

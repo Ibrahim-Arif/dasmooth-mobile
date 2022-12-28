@@ -190,21 +190,24 @@ export default function DashboardScreen({ navigation }) {
               }}
             />
           </View>
-          {batonsData.length > 0 && (
-            <DraggableFlatList
-              showsVerticalScrollIndicator={false}
-              ListFooterComponent={<View style={{ height: 100 }}></View>}
-              data={activeBatons}
-              onDragEnd={({ data }) => setBatons(data)}
-              keyExtractor={(item, index) => v4().toString()}
-              renderItem={({ item, drag, isActive }) =>
-                renderItem(
-                  { item, drag, isActive },
-                  getBaton[item.title.replace(/\s+/g, "")]
-                )
-              }
-            />
-          )}
+
+          <View style={{ marginTop: 10 }}>
+            {batonsData.length > 0 && (
+              <DraggableFlatList
+                showsVerticalScrollIndicator={false}
+                ListFooterComponent={<View style={{ height: 100 }}></View>}
+                data={activeBatons}
+                onDragEnd={({ data }) => setBatons(data)}
+                keyExtractor={(item, index) => v4().toString()}
+                renderItem={({ item, drag, isActive }) =>
+                  renderItem(
+                    { item, drag, isActive },
+                    getBaton[item.title.replace(/\s+/g, "")]
+                  )
+                }
+              />
+            )}
+          </View>
         </View>
       </>
     </SafeAreaView>

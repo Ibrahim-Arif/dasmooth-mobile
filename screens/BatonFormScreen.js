@@ -27,6 +27,7 @@ import {
 } from "../services";
 import logResponse from "../utilities/logger";
 import { StackActions } from "@react-navigation/native";
+import { useMemo } from "react";
 
 const popAction = StackActions.pop(1);
 
@@ -59,7 +60,7 @@ export default function BatonFormScreen({ route, navigation }) {
     text: "Attach a file",
     filesList: [],
   });
-
+  const [batonType, setBatonType] = useState(null);
   const [id, setID] = useState();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -305,6 +306,7 @@ export default function BatonFormScreen({ route, navigation }) {
 
       // if baton status is passed or received and memberId is same as logged in user,
       // then it means that the user is not the owner of the baton and cannot edit it
+
       if (
         filter.authorPostStatus == "passed" ||
         (filter.memberPostStatus == "received" &&
@@ -343,6 +345,58 @@ export default function BatonFormScreen({ route, navigation }) {
     }
     // logResponse("info", "Baton ID:" + id);
   }, [batonId]);
+
+  const editableFields = useMemo(() => {
+    if (isNewPost) {
+      return {
+        title: true,
+        description: true,
+        teamMember: true,
+        date: true,
+        budget: true,
+        postUpdate: true,
+        files: true,
+      };
+    } else {
+      console.log(fetchedDataObject);
+      if (fetchedDataObject.authorId == isLogin.uid)
+        switch (fetchedDataObject.authorPostStatus) {
+          case "pending":
+            return {
+              title: true,
+              description: true,
+              teamMember: true,
+              date: true,
+              budget: true,
+              postUpdate: true,
+              files: true,
+            };
+          case "passed":
+            return {
+              title: false,
+              description: false,
+              teamMember: false,
+              date: false,
+              budget: false,
+              postUpdate: true,
+              files: true,
+            };
+        }
+      else
+        switch (fetchedDataObject.memberPostStatus) {
+          case "received":
+            return {
+              title: false,
+              description: false,
+              teamMember: false,
+              date: false,
+              budget: false,
+              postUpdate: true,
+              files: true,
+            };
+        }
+    }
+  }, [batonId, isNewPost, fetchedDataObject]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -455,9 +509,8 @@ export default function BatonFormScreen({ route, navigation }) {
               style={{ marginTop: 25 }}
               bgColor={colors.azure}
               isEditable={
-                batonId != null || teamMemberData.text != "Select a team member"
-                  ? true
-                  : false
+                editableFields?.teamMember &&
+                teamMemberData.text != "Select a team member"
               }
               text={teamMemberData.text.substring(0, 2).toUpperCase()}
               isActive={teamMemberData.text != "Select a team member"}
@@ -477,9 +530,7 @@ export default function BatonFormScreen({ route, navigation }) {
               icon={({ size, color }) => (
                 <AntDesign name="calendar" size={size} color={color} />
               )}
-              isEditable={
-                batonId != null || dateData != "Set a deadline" ? true : false
-              }
+              isEditable={editableFields?.date && dateData != "Set a deadline"}
               isActive={dateData != "Set a deadline"}
               onPress={() =>
                 isEditable &&
@@ -495,7 +546,7 @@ export default function BatonFormScreen({ route, navigation }) {
 
             <Selectable
               isEditable={
-                batonId != null || budgetData != "Set a budget" ? true : false
+                editableFields?.budget && budgetData != "Set a budget"
               }
               bgColor={colors.azure}
               icon={({ color, size }) => (
@@ -516,7 +567,7 @@ export default function BatonFormScreen({ route, navigation }) {
 
             <Selectable
               isEditable={
-                filesList.filesList.length > 0 || batonId != null ? true : false
+                editableFields?.files && filesList.text != "Attach a file"
               }
               bgColor={colors.azure}
               icon="attachment"
@@ -539,9 +590,7 @@ export default function BatonFormScreen({ route, navigation }) {
             </Selectable>
 
             <Selectable
-              isEditable={
-                postUpdateData != "" || batonId != null ? true : false
-              }
+              isEditable={editableFields?.postUpdate && postUpdateData != ""}
               bgColor={colors.azure}
               icon="post"
               onPress={() =>

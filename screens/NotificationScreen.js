@@ -83,7 +83,12 @@ export default function NotificationScreen({ navigation, route }) {
     },
   ];
   // console.log(notifications);
-
+  const jsCoreDateCreator = (dateString) => {
+    // dateString *HAS* to be in this format "YYYY-MM-DD HH:MM:SS"
+    let dateParam = dateString.split(/[\s-:]/);
+    dateParam[1] = (parseInt(dateParam[1], 10) - 1).toString();
+    return new Date(...dateParam);
+  };
   const sectionSortedNotifications = useMemo(() => {
     if (notifications.length == 0) return [];
 
@@ -129,7 +134,9 @@ export default function NotificationScreen({ navigation, route }) {
         >
           {sectionSortedNotifications.map((item, index) => (
             <View key={v4()} style={index > 0 ? { marginTop: 32 } : {}}>
-              <Text>{moment(new Date(item.date)).format("MMM DD, YYYY")}</Text>
+              <Text>
+                {moment(jsCoreDateCreator(item.date)).format("MMM DD, YYYY")}
+              </Text>
 
               {item.notifications?.map((notification, index) => (
                 <Alert
@@ -140,7 +147,11 @@ export default function NotificationScreen({ navigation, route }) {
                   batonType={notification.type}
                   style={{ marginTop: 8 }}
                   onClose={() => {
-                    handleUpdateNotificationStatus(notification.docId, true);
+                    handleUpdateNotificationStatus(notification.batonId, true);
+                  }}
+                  onViewDetails={() => {
+                    const { batonId } = notification;
+                    navigation.navigate("BatonForm", { batonId: batonId });
                   }}
                 />
               ))}
