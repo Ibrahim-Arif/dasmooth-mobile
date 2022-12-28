@@ -68,7 +68,7 @@ export default function BatonFormScreen({ route, navigation }) {
     status: "pending",
     deletedOn: 0,
   });
-  const [fetchingLoading, setFetchingLoading] = useState(false);
+  const [fetchingLoading, setFetchingLoading] = useState(true);
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
@@ -139,7 +139,7 @@ export default function BatonFormScreen({ route, navigation }) {
             seen: false,
             message: "Baton Received",
             description: `You received a new Baton from ${post.authorName}`,
-            type: "success",
+            type: teamMemberData.status == "accepted" ? "passed" : "pending",
             uid: post.memberId,
             date: Date.now(),
             batonId: docId,
@@ -284,8 +284,16 @@ export default function BatonFormScreen({ route, navigation }) {
         setDisabled(false);
       else setDisabled(true);
     }
+    // console.log(disabled);
     return () => (isMounted = false);
-  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
+  }, [
+    dateData,
+    budgetData,
+    postUpdateData,
+    title,
+    teamMemberData,
+    description,
+  ]);
 
   useEffect(() => {
     // console.log("BatonFormScreen Line 76: batonID", batonId);
@@ -299,10 +307,16 @@ export default function BatonFormScreen({ route, navigation }) {
 
       let filter = batonsData.filter((e) => e.docId == batonId);
       filter = filter[0];
-      // console.log(filter);
 
-      // if filter is undefined, then it means that there is some issue with the data
-      if (filter == undefined) return;
+      // if filter is undefined, then it means that there is some issue with the data is not available in the batonsData array
+      if (filter == undefined) {
+        toast.show("Baton is not available", {
+          type: "warning",
+          style: { height: 50 },
+        });
+        navigation.navigate("DashboardMain");
+        return;
+      }
 
       // if baton status is passed or received and memberId is same as logged in user,
       // then it means that the user is not the owner of the baton and cannot edit it
@@ -341,6 +355,7 @@ export default function BatonFormScreen({ route, navigation }) {
       let tempId = v4();
       setID(tempId);
       setIsNewPost(true);
+      setFetchingLoading(false);
       flushData();
     }
     // logResponse("info", "Baton ID:" + id);
@@ -358,7 +373,7 @@ export default function BatonFormScreen({ route, navigation }) {
         files: true,
       };
     } else {
-      console.log(fetchedDataObject);
+      // console.log(fetchedDataObject);
       if (fetchedDataObject.authorId == isLogin.uid)
         switch (fetchedDataObject.authorPostStatus) {
           case "pending":
@@ -493,7 +508,7 @@ export default function BatonFormScreen({ route, navigation }) {
             />
             <TextInput
               style={{ marginTop: 5 }}
-              placeholder="Add  Description"
+              placeholder="Add Description"
               placeholderTextColor="black"
               onChangeText={(e) => setDescription(e)}
               mode="outlined"

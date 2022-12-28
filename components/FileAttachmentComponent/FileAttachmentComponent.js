@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, TouchableNativeFeedback, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  TouchableNativeFeedback,
+  View,
+  Text,
+} from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
@@ -187,48 +193,60 @@ export default function FileAttachmentComponent({
             <View style={{ marginTop: 15 }}>
               {imageData.filesList &&
                 imageData.filesList.map((e, index) => (
-                  <Selectable
-                    key={v4()}
-                    isActive={false}
-                    bgColor={colors.tealLight95}
-                    onPress={() => handleRemoveFile(index)}
-                    icon={
-                      <AntDesign
-                        name="delete"
-                        size={12}
-                        color={colors.teal100}
-                      />
-                    }
-                    style={{ height: 35 }}
-                    contentStyle={{ height: 35 }}
-                  >
-                    {e.fileName}
-                  </Selectable>
+                  <View key={v4()}>
+                    <TouchableNativeFeedback
+                      onPress={() => handleRemoveFile(index)}
+                    >
+                      <View style={styles.filesContainer}>
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            fontWeight: "400",
+                            marginLeft: 15,
+                            flexWrap: "wrap",
+                            flex: 1,
+                          }}
+                        >
+                          {e.fileName}
+                        </Text>
+                        <AntDesign
+                          name="delete"
+                          size={15}
+                          color={colors.teal100}
+                        />
+                      </View>
+                    </TouchableNativeFeedback>
+                  </View>
                 ))}
             </View>
-            <View style={{ marginTop: 15 }}>
+            <View style={{}}>
               {uploadedFiles.map((e, index) => (
-                <Selectable
-                  key={v4()}
-                  isActive={false}
-                  bgColor={colors.tealLight95}
-                  onPress={() => {
-                    handleSaveImageToGallery(e);
-                    // setSelectedImageToView(e.image);
-                    // setIsVisible(true);
-                  }}
-                  icon={
-                    <AntDesign
-                      name="download"
-                      size={12}
-                      color={colors.teal100}
-                    />
-                  }
-                  style={{ height: 35 }}
-                  contentStyle={{ height: 35 }}
-                >
-                  {e.fileName}
-                </Selectable>
+                <View key={v4()}>
+                  <TouchableNativeFeedback
+                    onPress={() => {
+                      handleSaveImageToGallery(e);
+                      // setSelectedImageToView(e.image);
+                      // setIsVisible(true);
+                    }}
+                  >
+                    <View style={styles.filesContainer}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "400",
+                          marginLeft: 15,
+                        }}
+                      >
+                        {e.fileName}
+                      </Text>
+                      <AntDesign
+                        name="download"
+                        size={15}
+                        color={colors.teal100}
+                      />
+                    </View>
+                  </TouchableNativeFeedback>
+                </View>
               ))}
             </View>
           </>
@@ -297,4 +315,12 @@ const styles = StyleSheet.create({
   },
   tealButtonContainer: { alignSelf: "center", marginTop: 15 },
   attachFileText: { fontSize: 16, marginTop: 15 },
+  filesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 10,
+    backgroundColor: colors.azure,
+    marginVertical: 5,
+  },
 });

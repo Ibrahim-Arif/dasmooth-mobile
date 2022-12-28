@@ -12,7 +12,7 @@ export default function NotificationScreen({ navigation, route }) {
   // console.log(notifications);
   const notifications = [
     {
-      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee3",
       date: 1657214814766,
       description: "You received a new Baton from Bilal",
       docId: "21kimbynhexPDlZhzSMm",

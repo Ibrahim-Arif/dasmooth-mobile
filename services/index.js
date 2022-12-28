@@ -1,5 +1,6 @@
 import { handleAddBaton } from "./handleAddBaton";
 import { handleAddBatonFiles } from "./handleAddBatonFiles";
+import { handleAddNotification } from "./handleAddNotification";
 import { handleAddPostUpdate } from "./handleAddPostUpdate";
 import { handleAddSystemUserToMember } from "./handleAddSystemUserToMemeber";
 import { handleAddTeamMember } from "./handleAddTeamMember";
@@ -19,6 +20,7 @@ import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
 export {
+  handleAddNotification,
   handleUpdateBaton,
   handleAddSystemUserToMember,
   handleUpdateTeamMemberStatus,
