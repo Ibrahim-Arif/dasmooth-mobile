@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  TouchableNativeFeedback,
-  View,
-  Text,
-} from "react-native";
+import { StyleSheet, TouchableNativeFeedback, View, Text } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 
 import ColoredText from "../ColoredText/ColoredText";
@@ -21,7 +14,7 @@ import {
   handleGetBatonFiles,
   handleUploadFile,
 } from "../../services";
-import { ActivityIndicator, Modal } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
 import { heights, widths } from "../../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
 import logResponse from "../../utilities/logger";
@@ -37,32 +30,32 @@ export default function FileAttachmentComponent({
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [selectedImageToView, setSelectedImageToView] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
+  // const [selectedImageToView, setSelectedImageToView] = useState("");
+  // const [isVisible, setIsVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState(0);
   const toast = useToast();
   const [status, requestPermission] = MediaLibrary.usePermissions();
 
-  const showModal = () => setIsVisible(true);
-  const hideModal = () => setIsVisible(false);
+  // const showModal = () => setIsVisible(true);
+  // const hideModal = () => setIsVisible(false);
 
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-    });
-    // console.log("\n\n\nRESULT:'");
-    // console.log(result);
-    const items = [...fileData.filesList];
-    if (!result.cancelled) {
-      let fileName = "";
-      fileName = result.uri.split("/").slice(-1)[0];
-      result.fileName = fileName;
-      items.push(result);
-      setFileData({ ...fileData, filesList: items });
-      // console.log(items);
-    }
-  };
+  // const pickImage = async () => {
+  //   // No permissions request is necessary for launching the image library
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //   });
+  //   // console.log("\n\n\nRESULT:'");
+  //   // console.log(result);
+  //   const items = [...fileData.filesList];
+  //   if (!result.cancelled) {
+  //     let fileName = "";
+  //     fileName = result.uri.split("/").slice(-1)[0];
+  //     result.fileName = fileName;
+  //     items.push(result);
+  //     setFileData({ ...fileData, filesList: items });
+  //     // console.log(items);
+  //   }
+  // };
 
   const pickFile = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
@@ -187,6 +180,7 @@ export default function FileAttachmentComponent({
       setDownloading(false);
     }
   };
+
   useEffect(() => {
     return () => {
       // console.log(fileData);
