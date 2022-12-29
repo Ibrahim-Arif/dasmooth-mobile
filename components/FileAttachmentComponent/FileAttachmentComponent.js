@@ -177,6 +177,10 @@ export default function FileAttachmentComponent({
       setDownloading(false);
     } catch (ex) {
       logResponse("error", ex.message);
+      toast.show(ex.message, {
+        type: "danger",
+        style: { height: 50 },
+      });
       setDownloading(false);
     }
   };
@@ -314,29 +318,6 @@ export default function FileAttachmentComponent({
           />
         )}
       </View>
-      {/* <View style={{ height: 50 }}></View> */}
-      {/* <Modal
-        visible={isVisible}
-        onDismiss={hideModal}
-        style={{
-          // backgroundColor: "white",
-          justifyContent: "center",
-          alignItems: "center",
-          height: 500,
-        }}
-      >
-        <View
-          style={{
-            width: widths.width90p,
-            height: heights.height50p,
-          }}
-        >
-          <Image
-            source={{ uri: `data:image/gif;base64,${selectedImageToView}` }}
-            style={{ width: "100%", height: "100%" }}
-          />
-        </View> */}
-      {/* </Modal> */}
     </View>
   );
 }
