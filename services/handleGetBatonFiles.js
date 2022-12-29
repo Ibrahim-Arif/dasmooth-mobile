@@ -9,7 +9,7 @@ export const handleGetBatonFiles = async (batonId, setData) => {
   try {
     const db = getFirestore();
     const q = query(
-      collection(db, "batonImages"),
+      collection(db, "batonAttachments"),
       where("batonId", "==", batonId)
     );
 

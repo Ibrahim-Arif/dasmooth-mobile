@@ -17,9 +17,12 @@ import { handleSignUp } from "./handleSignUp";
 import { handleUpdateBaton } from "./handleUpdateBaton";
 import { handleUpdateNotificationStatus } from "./handleUpdateNotificationStatus";
 import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
+import { handleUploadFile } from "./handleUploadFile";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
+
 export {
+  handleUploadFile,
   handleAddNotification,
   handleUpdateBaton,
   handleAddSystemUserToMember,

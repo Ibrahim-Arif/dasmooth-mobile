@@ -9,13 +9,18 @@ import {
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
+
 import ColoredText from "../ColoredText/ColoredText";
 import TealButton from "../TealButton/TealButton";
-import Selectable from "../Selectable/Selectable";
 import { AntDesign } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 import { ScrollView } from "react-native-gesture-handler";
-import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
+import {
+  handleAddBatonFiles,
+  handleGetBatonFiles,
+  handleUploadFile,
+} from "../../services";
 import { ActivityIndicator, Modal } from "react-native-paper";
 import { heights, widths } from "../../utilities/sizes";
 import { useToast } from "react-native-toast-notifications";
@@ -28,9 +33,10 @@ export default function FileAttachmentComponent({
   closeScreen,
   batonId,
 }) {
-  const [imageData, setImageData] = useState({ filesList: [] });
+  const [fileData, setFileData] = useState({ filesList: [] });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [selectedImageToView, setSelectedImageToView] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [uploadCount, setUploadCount] = useState(0);
@@ -44,27 +50,39 @@ export default function FileAttachmentComponent({
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      base64: true,
     });
     // console.log("\n\n\nRESULT:'");
     // console.log(result);
-    const items = [...imageData.filesList];
+    const items = [...fileData.filesList];
     if (!result.cancelled) {
       let fileName = "";
       fileName = result.uri.split("/").slice(-1)[0];
       result.fileName = fileName;
       items.push(result);
-      setImageData({ ...imageData, filesList: items });
+      setFileData({ ...fileData, filesList: items });
       // console.log(items);
     }
   };
 
+  const pickFile = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    // console.log("\n\n\nRESULT:'");
+    // console.log(result);
+    const items = [...fileData.filesList];
+    if (!result.cancelled) {
+      let temp = { ...result };
+      temp.fileName = result.name;
+      items.push(temp);
+      setFileData({ ...fileData, filesList: items });
+      // console.log(items);
+    }
+  };
   const handleRemoveFile = (index) => {
-    let temp = imageData.filesList;
+    let temp = fileData.filesList;
     delete temp[index];
 
-    setImageData({
-      ...imageData,
+    setFileData({
+      ...fileData,
       filesList: temp.filter((e) => e != undefined),
     });
   };
@@ -74,31 +92,49 @@ export default function FileAttachmentComponent({
       toast.show("Baton Id is null", { type: "danger" });
       return;
     }
-    if (imageData.filesList.length == 0) return;
+    if (fileData.filesList.length == 0) return;
     setUploading(true);
-    for (let i = 0; i < imageData.filesList.length; i++) {
-      // var reader = new FileReader();
 
-      let imagesData = {
-        image: imageData.filesList[i].base64,
-        batonId: batonId,
-        fileName: imageData.filesList[i].fileName,
-      };
-      setImageData({ filesList: [] });
-      handleAddBatonFiles(imagesData)
-        .then(() => {
-          // generateNotification("success", "Images uploaded successfully");
-          toast.show("Images uploaded successfully", {
-            type: "success",
-            style: { height: 50 },
-          });
-          setUploading(false);
-          setUploadCount(uploadCount + 1);
+    for (let i = 0; i < fileData.filesList.length; i++) {
+      console.log(fileData.filesList[i]);
+      handleUploadFile(
+        fileData.filesList[i].uri,
+        fileData.filesList[i].fileName,
+        batonId
+      )
+        .then((res) => {
+          let filesData = {
+            file: res,
+            batonId: batonId,
+            fileName: fileData.filesList[i].fileName,
+          };
 
-          // clickOk();
+          setFileData({ filesList: [] });
+
+          handleAddBatonFiles(filesData)
+            .then(() => {
+              // generateNotification("success", "files uploaded successfully");
+              toast.show("files uploaded successfully", {
+                type: "success",
+                style: { height: 50 },
+              });
+              setUploading(false);
+              setUploadCount(uploadCount + 1);
+
+              // clickOk();
+            })
+            .catch((ex) => {
+              toast.show("Error uploading files", {
+                type: "danger",
+                style: { height: 50 },
+              });
+              // generateNotification("error", "Failed to upload files!");
+              setUploading(false);
+            });
         })
         .catch((ex) => {
-          toast.show("Error uploading images", {
+          console.log(ex.message);
+          toast.show("Error uploading files", {
             type: "danger",
             style: { height: 50 },
           });
@@ -109,60 +145,66 @@ export default function FileAttachmentComponent({
     // closeScreen();
   };
 
-  const handleSaveImageToGallery = async (file) => {
-    let image = "";
+  const handleSaveFileToGallery = async (file) => {
     try {
+      setDownloading(file.fileName);
       if (status !== "granted") {
         requestPermission();
-        console.log(file.image);
-        const filename = FileSystem.documentDirectory + file.fileName;
+        const downloadInstance = FileSystem.createDownloadResumable(
+          file.file,
+          FileSystem.documentDirectory + file.fileName
+        );
 
-        if (file.image.includes("data:image/png;base64,"))
-          image = file.image.replace("data:image/png;base64,", "");
-        else image = file.image;
+        const result = await downloadInstance.downloadAsync();
+        const asset = await MediaLibrary.createAssetAsync(result.uri);
+        await MediaLibrary.createAlbumAsync("MediaDownloads", asset, false);
 
-        await FileSystem.writeAsStringAsync(filename, image, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
-
-        toast.show(file.fileName + " saved to gallery", {
+        toast.show(file.fileName + " saved to MediaDownloads folder", {
           type: "success",
+          style: { height: 50 },
         });
       } else {
-        const filename = FileSystem.documentDirectory + file.fileName;
-        await FileSystem.writeAsStringAsync(filename, file.image, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+        const downloadInstance = FileSystem.createDownloadResumable(
+          file.file,
+          FileSystem.documentDirectory + file.fileName
+        );
 
-        toast.show("Image saved to gallery", {
-          type: "info",
+        const result = await downloadInstance.downloadAsync();
+        const asset = await MediaLibrary.createAssetAsync(result.uri);
+        await MediaLibrary.createAlbumAsync("MediaDownloads", asset, false);
+
+        // await FileSystem.writeAsStringAsync(filename, result);
+        // await MediaLibrary.saveToLibraryAsync(result.uri);
+
+        toast.show(file.fileName + " saved to MediaDownloads folder", {
+          type: "success",
           style: { height: 50 },
         });
       }
+      setDownloading(false);
     } catch (ex) {
       logResponse("error", ex.message);
+      setDownloading(false);
     }
   };
   useEffect(() => {
     return () => {
-      // console.log(imageData);
+      // console.log(fileData);
       // if imagedata or uploadedfiles is empty, then it means that the user has not uploaded any files
-      if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
+      if (fileData.filesList.length == 0 && uploadedFiles.length == 0)
         setSelectedItem({
-          filesList: [...imageData.filesList, ...uploadedFiles],
+          filesList: [...fileData.filesList, ...uploadedFiles],
           text: "Attach a file",
         });
       // else there are some files which we want to send to the baton form screen
       // so that we can show the files length in the baton form screen
       else
         setSelectedItem({
-          filesList: [...imageData.filesList, ...uploadedFiles],
+          filesList: [...fileData.filesList, ...uploadedFiles],
           text: `${uploadedFiles.length} files attached`,
         });
     };
-  }, [imageData, uploadedFiles]);
+  }, [fileData, uploadedFiles]);
 
   useEffect(() => {
     // console.log(batonId);
@@ -174,7 +216,7 @@ export default function FileAttachmentComponent({
     <View style={{ padding: 20 }}>
       {/* Drag and Drop Container */}
 
-      <TouchableNativeFeedback onPress={pickImage}>
+      <TouchableNativeFeedback onPress={pickFile}>
         <View style={styles.dragDropContainer}>
           <AntDesign name="inbox" size={45} color={colors.teal100} />
           <ColoredText>Tap to browse the files</ColoredText>
@@ -191,8 +233,8 @@ export default function FileAttachmentComponent({
         {!uploading && (
           <>
             <View style={{ marginTop: 15 }}>
-              {imageData.filesList &&
-                imageData.filesList.map((e, index) => (
+              {fileData.filesList &&
+                fileData.filesList.map((e, index) => (
                   <View key={v4()}>
                     <TouchableNativeFeedback
                       onPress={() => handleRemoveFile(index)}
@@ -224,7 +266,7 @@ export default function FileAttachmentComponent({
                 <View key={v4()}>
                   <TouchableNativeFeedback
                     onPress={() => {
-                      handleSaveImageToGallery(e);
+                      handleSaveFileToGallery(e);
                       // setSelectedImageToView(e.image);
                       // setIsVisible(true);
                     }}
@@ -239,11 +281,15 @@ export default function FileAttachmentComponent({
                       >
                         {e.fileName}
                       </Text>
-                      <AntDesign
-                        name="download"
-                        size={15}
-                        color={colors.teal100}
-                      />
+                      {downloading == e.fileName ? (
+                        <ActivityIndicator size={15} color={colors.teal100} />
+                      ) : (
+                        <AntDesign
+                          name="download"
+                          size={15}
+                          color={colors.teal100}
+                        />
+                      )}
                     </View>
                   </TouchableNativeFeedback>
                 </View>
@@ -256,8 +302,8 @@ export default function FileAttachmentComponent({
 
       {!uploading && (
         <ColoredText color="teal" style={styles.attachFileText}>
-          {imageData.filesList.length > 0
-            ? imageData.filesList.length + uploadedFiles.length
+          {fileData.filesList.length > 0
+            ? fileData.filesList.length + uploadedFiles.length
             : uploadedFiles.length}{" "}
           files attached
         </ColoredText>
