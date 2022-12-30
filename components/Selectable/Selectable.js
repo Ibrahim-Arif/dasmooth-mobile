@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Avatar, Button } from "react-native-paper";
 import { colors } from "../../utilities/colors";
 import { Ionicons } from "@expo/vector-icons";
-import { Text, View, StyleSheet, TouchableNativeFeedback } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableNativeFeedback,
+  Pressable,
+} from "react-native";
 
 export default function Selectable({
   bgColor = null,
@@ -20,21 +26,41 @@ export default function Selectable({
   iconColor = null,
   children,
 }) {
+  const [pressed, setPressed] = React.useState(false);
+
+  const backgroundColor = useMemo(() => {
+    let bgColor = null;
+    if (disabled) {
+      bgColor = colors.lightShade;
+    } else {
+      if (isActive) {
+        if (pressed) bgColor = colors.eden;
+        else bgColor = colors.mosque;
+      } else {
+        if (!bgColor) {
+          bgColor = colors.azure;
+        } else {
+          bgColor = bgColor;
+        }
+      }
+    }
+    return bgColor;
+  }, [disabled, isActive, pressed]);
+
   return (
-    <TouchableNativeFeedback disabled={disabled} onPress={onPress}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+    >
       <View
         style={[
           styles.container,
           {
             width: "100%",
             height: 60,
-            backgroundColor: disabled
-              ? colors.lightShade
-              : isActive
-              ? colors.mosque
-              : !bgColor
-              ? colors.azure
-              : bgColor,
+            backgroundColor: backgroundColor,
             color: disabled ? "black" : isActive ? "white" : "black",
             justifyContent: "flex-start",
             marginVertical: 5,
@@ -43,16 +69,17 @@ export default function Selectable({
             borderRadius: 5,
             ...style,
           },
-          !disabled && {
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 4,
+          !disabled &&
+            !pressed && {
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 4,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 6,
+              elevation: 5,
             },
-            shadowOpacity: 0.25,
-            shadowRadius: 6,
-            elevation: 5,
-          },
         ]}
       >
         {icon ? (
@@ -110,7 +137,7 @@ export default function Selectable({
           />
         )}
       </View>
-    </TouchableNativeFeedback>
+    </Pressable>
   );
 }
 

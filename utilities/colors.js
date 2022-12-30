@@ -37,4 +37,5 @@ export const colors = {
   lightShade: "#e2e2e2",
   "5f6b72": "#5f6b72",
   "37474f": "#37474f",
+  eden: "#0e4540",
 };

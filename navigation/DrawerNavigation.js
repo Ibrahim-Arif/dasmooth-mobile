@@ -210,6 +210,7 @@ const CustomDrawerContent = ({ state, descriptors, navigation }) => {
     </DrawerContentScrollView>
   );
 };
+
 export default function DrawerNavigation() {
   return (
     <Drawer.Navigator

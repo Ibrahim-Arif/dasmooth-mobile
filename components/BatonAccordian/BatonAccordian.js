@@ -1,9 +1,17 @@
 import React from "react";
-import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  TouchableHighlight,
+  TouchableNativeFeedback,
+} from "react-native";
 import { List } from "react-native-paper";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { colors } from "../../utilities/colors";
 import { v4 } from "uuid";
+import { useMemo } from "react";
 
 export default function BatonAccordian({
   title = "Baton",
@@ -18,44 +26,40 @@ export default function BatonAccordian({
   // const handlePress = () => setExpanded(!expanded);
 
   const [pressed, setPressed] = React.useState(false);
+
   const CustomListItem = ({ title, docId }) => {
     const [focused, setFocused] = React.useState(false);
+
+    const borderColor = useMemo(
+      () => (focused ? color : colors.white),
+      [focused]
+    );
+
     return (
-      <View key={v4()}>
-        <List.Item
-          title={title}
+      <TouchableNativeFeedback
+        onPress={() => {
+          // setFocused(true);
+          navigation.navigate("BatonForm", { batonId: docId });
+          // setFocused(false);
+        }}
+        key={v4()}
+      >
+        <View
           style={[
             {
               borderWidth: 1,
-              borderTopColor: focused ? color : colors.white,
-              borderRightColor: focused ? color : colors.white,
-              borderBottomColor: focused ? color : colors.white,
+              borderTopColor: borderColor,
+              borderRightColor: borderColor,
+              borderBottomColor: borderColor,
               borderLeftColor: color,
             },
             styles.listItem,
           ]}
-          // onPressIn={() => {
-          //   setFocused(true);
-          // }}
-          // onPressOut={() => {
-          //   navigation.navigate("BatonForm", { batonId: docId });
-          //   setFocused(false);
-          // }}
-          right={(props) => (
-            <List.Icon
-              {...props}
-              icon={() => <AntDesign name="right" size={24} color="black" />}
-            />
-          )}
-          // onPressIn={() => setPressed(true)}
-          // onPressOut={() => setPressed(false)}
-          onPress={() => {
-            setFocused(true);
-            navigation.navigate("BatonForm", { batonId: docId });
-            setFocused(false);
-          }}
-        />
-      </View>
+        >
+          <Text style={{ fontSize: 16 }}>{title}</Text>
+          <AntDesign name="right" size={24} color="black" />
+        </View>
+      </TouchableNativeFeedback>
     );
   };
   return (
@@ -108,6 +112,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3,
     elevation: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 55,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   accordion: { borderTopWidth: 3, color: "black", marginTop: 10 },
   titleStyle: { color: "black", fontWeight: "bold" },
