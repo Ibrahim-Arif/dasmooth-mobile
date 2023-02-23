@@ -16,7 +16,7 @@ export const handleAddSystemUserToMember = async (data) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      // console.log("Document data:", docSnap.data());
+      console.log("Document data:", docSnap.data());
       handleAddTeamMemberByInvite({
         receiverId: docSnap.data().uid,
         receiverEmail: data.email,

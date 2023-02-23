@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 
 export const handleUploadFile = async (file, fileName, batonId) => {
   try {
-    console.log(file);
-    const downloadUrl = await uploadFileAsync(file, fileName, batonId);
-    return downloadUrl;
+    // console.log(file);
+    const url = await uploadFileAsync(file, fileName, batonId);
+    return url;
   } catch (ex) {
     throw new Error(ex);
   }
@@ -14,12 +14,13 @@ export const handleUploadFile = async (file, fileName, batonId) => {
 // this is the method that will upload the local file to fireStorage
 const uploadFileAsync = async (file, fileName, batonId) => {
   try {
-    const blob = await fetch(file).then((res) => {
-      return res.blob();
-    });
+    // let uri = URL.createObjectURL(file);
+    // const blob = await fetch(uri).then((res) => {
+    //   return res.blob();
+    // });
     const storage = getStorage();
     const storageRef = ref(storage, `/batonAttachments/${batonId}/${fileName}`);
-    const snapshot = await uploadBytes(storageRef, blob);
+    const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
   } catch (ex) {
     ex.message = "Upload File Error: " + ex.message;

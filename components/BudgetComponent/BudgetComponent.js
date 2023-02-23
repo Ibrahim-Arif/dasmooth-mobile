@@ -1,19 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { TextInput, Checkbox } from "react-native-paper";
 import { colors } from "../../utilities/colors";
 import TealButton from "../TealButton/TealButton";
 
 export default function BudgetComponent({
-  selectedItem,
-  setSelectedItem,
+  itemSelected,
+  setItemSelected,
   closeScreen,
 }) {
-  const [text, setText] = React.useState("");
-  useEffect(
-    () => setText(selectedItem == "Set a budget" ? "0" : selectedItem),
-    []
-  );
+  const [text, setText] = useState("");
+  useEffect(() => (itemSelected ? setText(itemSelected) : null), []);
+
   return (
     <View style={{ alignItems: "center", padding: 20 }}>
       <TextInput
@@ -43,7 +41,7 @@ export default function BudgetComponent({
         <TealButton
           text="SET BUDGET"
           onPress={() => {
-            if (text != "") setSelectedItem(text);
+            if (text != "") setItemSelected(text);
             closeScreen();
           }}
         />

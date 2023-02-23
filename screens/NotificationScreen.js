@@ -151,7 +151,7 @@ export default function NotificationScreen({ navigation, route }) {
                   }}
                   onViewDetails={() => {
                     const { batonId } = notification;
-                    navigation.navigate("BatonForm", { batonId: batonId });
+                    navigation.navigate("BatonForm", { id: batonId });
                   }}
                 />
               ))}

@@ -21,7 +21,7 @@ const uploadImageAsync = async (image) => {
       return res.blob();
     });
     const storage = getStorage();
-    const storageRef = ref(storage, "/batonAttachmentsmentsments/" + uuidv4());
+    const storageRef = ref(storage, "/batonAttachments/" + uuidv4());
     const snapshot = await uploadBytes(storageRef, blob);
     return await getDownloadURL(snapshot.ref);
   } catch (ex) {

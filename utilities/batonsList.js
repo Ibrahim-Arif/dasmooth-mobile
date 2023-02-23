@@ -1,4 +1,10 @@
 export const batonsList = {
+  draft: {
+    title: "Draft Batons",
+    borderColor: "#5E94D4",
+    bgColor: "#fff",
+    status: "draft",
+  },
   pending: {
     title: "Pending Batons",
     borderColor: "#5f6b72",
@@ -7,13 +13,13 @@ export const batonsList = {
   },
   passed: {
     title: "Passed Batons",
-    borderColor: "#EFB029",
+    borderColor: "#EFB000",
     bgColor: "#FDF7E6",
     status: "passed",
   },
   received: {
     title: "Received Batons",
-    borderColor: "#8217B1",
+    borderColor: "#8e2eb9",
     bgColor: "#F7EFFD",
     status: "received",
   },

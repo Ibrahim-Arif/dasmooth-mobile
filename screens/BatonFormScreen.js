@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView } from "react-native-gesture-handler";
-import { View, StyleSheet, SafeAreaView, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+  Modal,
+  Text,
+} from "react-native";
 import {
   ActivityIndicator,
   Avatar,
   IconButton,
   Menu,
   TextInput,
+  Button,
 } from "react-native-paper";
 
 import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
@@ -23,79 +31,91 @@ import {
   handleAddNotification,
   handleDeleteBaton,
   handleGetBatonFiles,
+  handleGetBatonFilesSnapshot,
+  handleGetBatonPostUpdates,
   handleUpdateBaton,
 } from "../services";
 import logResponse from "../utilities/logger";
 import { StackActions } from "@react-navigation/native";
 import { useMemo } from "react";
+import { widths } from "../utilities/sizes";
 
 const popAction = StackActions.pop(1);
 
 export default function BatonFormScreen({ route, navigation }) {
-  const { batonId } = route.params;
+  const { id } = route.params;
   const { batonsData, isLogin } = useUser();
   const toast = useToast();
 
-  const [mode, setMode] = useState(0);
-  const [activeTitle, setActiveTitle] = useState("Dummy Title");
-  const [activeComponent, setActiveComponent] = useState(null);
-  const [activeItemIndex, setActiveItemIndex] = useState(-1);
-  const [teamMemberData, setTeamMemberData] = useState({
-    text: "Select a team member",
-    icon: (
-      <Avatar.Icon
-        size={40}
-        icon={({ color, size }) => (
-          <AntDesign name="user" size={size} color={color} />
-        )}
-      />
-    ),
-  });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDraftModalVisible, setIsDraftModalVisible] = useState(false);
+  const [activeTitle, setActiveTitle] = useState("");
+
+  // 0 means no item is selected
+  // 1 means the first item is selected
+  // 2 means the second item is selected
+  // 3 means the third item is selected
+  // 4 means the fourth item is selected
+  // 5 means the fifth item is selected
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [teamMemberData, setTeamMemberData] = useState(null);
+  const [dateData, setDateData] = useState(null);
+  const [budgetData, setBudgetData] = useState(null);
+  const [postUpdateData, setPostUpdateData] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [dateData, setDateData] = useState("Set a deadline");
-  const [budgetData, setBudgetData] = useState("Set a budget");
-  const [postUpdateData, setPostUpdateData] = useState("");
-  const [filesList, setFilesList] = useState({
-    text: "Attach a file",
-    filesList: [],
-  });
-  const [batonType, setBatonType] = useState(null);
-  const [id, setID] = useState();
-  const [disabled, setDisabled] = useState(true);
+  const [filesList, setFilesList] = useState(null);
+  const [batonId, setBatonId] = useState(null);
+  const [allowGoBack, setAllowGoBack] = useState(false);
+
   const [loading, setLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [dataFetchLoading, setDataFetchLoading] = useState(false);
   const [fetchedDataObject, setFetchedDataObject] = useState({
     status: "pending",
     deletedOn: 0,
   });
-  const [fetchingLoading, setFetchingLoading] = useState(true);
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [isDraft, setIsDraft] = useState(false);
   const [visible, setVisible] = React.useState(false);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
+  // Conditions
+
+  // if baton is not delete and there is an id in the url and the author of the baton is the same as the logged in user
+  const doShowDropDownMenuOnPage =
+    !isDeleted && batonId && fetchedDataObject.authorId == isLogin.uid;
+
+  const isTitleInputFieldDisabled =
+    fetchedDataObject.authorPostStatus != "pending" &&
+    fetchedDataObject.authorPostStatus != "draft" &&
+    fetchedDataObject.authorPostStatus != undefined
+      ? true
+      : false;
+
+  const isAddDescriptionInputFieldDisabled =
+    fetchedDataObject.authorPostStatus != "pending" &&
+    fetchedDataObject.authorPostStatus != "draft" &&
+    fetchedDataObject.authorPostStatus != undefined
+      ? true
+      : false;
+
+  const isSelectableItemPressable = isEditable && !isDeleted;
+
   const flushData = () => {
-    setActiveComponent(null);
-    setActiveItemIndex(-1);
+    setActiveItemIndex(0);
+    // setID(null);
+    // setTitle("");
     setActiveTitle("");
-    setTeamMemberData({
-      text: "Select a team member",
-      icon: (
-        <Avatar.Icon
-          size={40}
-          icon={({ color, size }) => (
-            <AntDesign name="user" size={size} color={color} />
-          )}
-        />
-      ),
-    });
-    setDateData("Set a deadline");
-    setBudgetData("Set a budget");
-    setPostUpdateData("");
+    setTeamMemberData(null);
+    setDateData(null);
+    setBudgetData(null);
+    setPostUpdateData(null);
+    setFilesList(null);
   };
 
   const handlePass = () => {
@@ -107,9 +127,9 @@ export default function BatonFormScreen({ route, navigation }) {
     //   title
     // );
 
-    if (isNewPost) {
+    if (isNewPost || isDraft) {
       // console.log("New");
-      logResponse("notify", "Creating New Baton!");
+      console.log(teamMemberData);
       let post = {
         deadline: dateData,
         budget: budgetData,
@@ -118,7 +138,7 @@ export default function BatonFormScreen({ route, navigation }) {
         memberId: teamMemberData.id,
         authorName:
           isLogin.displayName != null ? isLogin.displayName : isLogin.email,
-        memberName: teamMemberData.text,
+        memberName: teamMemberData.name,
         authorPostStatus:
           teamMemberData.status == "accepted" ? "passed" : "pending",
         memberPostStatus: "received",
@@ -127,72 +147,118 @@ export default function BatonFormScreen({ route, navigation }) {
         description: description,
       };
       // console.log("new Post");
-      // console.log(post);
+      console.log(post);
       // return;
+
       setLoading(true);
-
       // console.log("Adding new post");
-
-      handleAddBaton(post, id)
+      handleAddBaton(post, batonId)
         .then((docId) => {
           handleAddNotification({
             seen: false,
             message: "Baton Received",
             description: `You received a new Baton from ${post.authorName}`,
-            type: teamMemberData.status == "accepted" ? "passed" : "pending",
+            type: "success",
+            batonType: "received",
             uid: post.memberId,
             date: Date.now(),
             batonId: docId,
           });
-
           toast.show("You baton is created", {
             type: "success",
             style: { height: 50 },
           });
           setLoading(false);
-          navigation.navigate("DashboardMain");
+
+          navigation.goBack();
         })
         .catch((ex) => {
-          toast.show("Failed to create your baton", {
-            type: "error",
-            style: { height: 50 },
+          toast.show("Failed to create you baton", {
+            type: "danger",
           });
-          logResponse("error", ex.message);
+          // console.log(ex);
           setLoading(false);
         });
     } else {
-      logResponse("notify", "Updating Baton!");
+      // console.log("Edit");
       let editedPost = {
         ...fetchedDataObject,
         deadline: dateData,
         budget: budgetData,
         title: title,
         description: description,
-        memberName: teamMemberData.text,
+        memberName: teamMemberData.name,
         updateOn: Date.now(),
       };
-
+      console.log("editedPost", editedPost);
       // console.log(editedPost);
       // return;
       setLoading(true);
-      handleUpdateBaton(id, editedPost)
+      handleUpdateBaton(batonId, editedPost)
         .then(() => {
           setLoading(false);
-          toast.show("Baton is update", {
+          navigation.goBack();
+          toast.show("Baton is updated", {
             type: "success",
             style: { height: 50 },
           });
-          navigation.navigate("DashboardMain");
         })
         .catch((ex) => {
           setLoading(false);
-          toast.show("Failed to update your baton", {
-            type: "error",
-            style: { height: 50 },
+
+          toast.show("Failed to update baton", {
+            type: "danger",
           });
-          logResponse("error", ex.message);
+          console.log(ex);
         });
     }
+  };
+
+  const handleAddToDrafts = () => {
+    let post = {
+      deadline: dateData ? dateData : null,
+      budget: budgetData ? budgetData : null,
+      title: title ? title : "",
+      authorId: isLogin.uid,
+      memberId: teamMemberData?.id ? teamMemberData.id : null,
+      authorName:
+        isLogin.displayName != null ? isLogin.displayName : isLogin.email,
+      memberName: teamMemberData?.name ? teamMemberData.name : null,
+      authorPostStatus: "draft",
+      memberPostStatus: "draft",
+      createdOn: Date.now(),
+      deletedOn: 0,
+      description: description ? description : "",
+    };
+    // console.log("new Post");
+    // console.log(post);
+    // return;
+
+    setModalLoading(true);
+    // console.log("Adding new post");
+    handleAddBaton(post, batonId)
+      .then((docId) => {
+        toast.show("Baton is saved", {
+          type: "success",
+          style: { height: 50 },
+        });
+
+        setModalLoading(false);
+        navigation.goBack();
+      })
+      .catch((ex) => {
+        toast.show("Failed to save baton", {
+          type: "danger",
+        });
+        console.log(ex);
+        setModalLoading(false);
+      });
+  };
+
+  const resetFormView = () => {
+    // console.log("resetFormView calling");
+    setActiveItemIndex(0);
+    setActiveTitle("");
   };
 
   const handleDeleteClick = () => {
@@ -259,110 +325,8 @@ export default function BatonFormScreen({ route, navigation }) {
     ]);
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      if (batonId != null)
-        setFilesList({
-          filesList: uploadedFiles,
-          text: `${uploadedFiles.length} files attached`,
-        });
-    }
-    return () => (isMounted = false);
-  }, [uploadedFiles]);
-
-  useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      if (
-        dateData != "Set a deadline" &&
-        budgetData != "Set a budget" &&
-        teamMemberData != "Select a team member" &&
-        title != "" &&
-        description != ""
-      )
-        setDisabled(false);
-      else setDisabled(true);
-    }
-    // console.log(disabled);
-    return () => (isMounted = false);
-  }, [
-    dateData,
-    budgetData,
-    postUpdateData,
-    title,
-    teamMemberData,
-    description,
-  ]);
-
-  useEffect(() => {
-    // console.log("BatonFormScreen Line 76: batonID", batonId);
-    logResponse("info", "BatonFormScreen Line 278: Params batonID: " + batonId);
-
-    if (batonId != null) {
-      setFetchingLoading(true);
-      handleGetBatonFiles(batonId, setUploadedFiles);
-      setIsNewPost(false);
-      if (batonsData.length == 0) return;
-
-      let filter = batonsData.filter((e) => e.docId == batonId);
-      filter = filter[0];
-
-      // if filter is undefined, then it means that there is some issue with the data is not available in the batonsData array
-      if (filter == undefined) {
-        toast.show("Baton is not available", {
-          type: "warning",
-          style: { height: 50 },
-        });
-        navigation.navigate("DashboardMain");
-        return;
-      }
-
-      // if baton status is passed or received and memberId is same as logged in user,
-      // then it means that the user is not the owner of the baton and cannot edit it
-
-      if (
-        filter.authorPostStatus == "passed" ||
-        (filter.memberPostStatus == "received" &&
-          filter.memberId == isLogin.uid)
-      )
-        setIsEditable(false);
-
-      if (
-        filter.authorPostStatus == "deleted" ||
-        filter.authorPostStatus == "received"
-      )
-        setIsDeleted(true);
-
-      logResponse("warning", " isDeleted: " + isDeleted);
-      logResponse("warning", " isEditable: " + isEditable);
-
-      setFetchedDataObject(filter);
-      setTitle(filter.title);
-      setDescription(filter.description);
-      setBudgetData(filter.budget);
-
-      setDateData(filter.deadline);
-      setPostUpdateData(filter.post);
-      setTeamMemberData({
-        text: filter.memberName,
-        icon: null,
-      });
-      setID(batonId);
-
-      setFetchingLoading(false);
-    } else {
-      let tempId = v4();
-      setID(tempId);
-      setIsNewPost(true);
-      setFetchingLoading(false);
-      flushData();
-    }
-    // logResponse("info", "Baton ID:" + id);
-  }, [batonId]);
-
   const editableFields = useMemo(() => {
-    if (isNewPost) {
+    if (isNewPost || isDraft) {
       return {
         title: true,
         description: true,
@@ -373,7 +337,7 @@ export default function BatonFormScreen({ route, navigation }) {
         files: true,
       };
     } else {
-      // console.log(fetchedDataObject);
+      console.log(fetchedDataObject);
       if (fetchedDataObject.authorId == isLogin.uid)
         switch (fetchedDataObject.authorPostStatus) {
           case "pending":
@@ -411,11 +375,201 @@ export default function BatonFormScreen({ route, navigation }) {
             };
         }
     }
-  }, [batonId, isNewPost, fetchedDataObject]);
+  }, [id]);
 
+  useEffect(() => {
+    // console.log("params:", params);
+    if (id) {
+      setDataFetchLoading(true);
+      handleGetBatonFilesSnapshot(id, setFilesList);
+      handleGetBatonPostUpdates(id, setPostUpdateData);
+      setIsNewPost(false);
+      if (batonsData.length == 0) return;
+
+      let filter = batonsData.filter((e) => e.docId == id);
+      filter = filter[0];
+      // console.log(filter);
+
+      if (filter == undefined) {
+        setDataFetchLoading(false);
+        return;
+      }
+
+      if (
+        filter.authorPostStatus == "draft" &&
+        filter.authorId == isLogin.uid
+      ) {
+        setIsEditable(true);
+        setIsDraft(true);
+        setFetchedDataObject(filter);
+        setTitle(filter.title);
+        setDescription(filter.description);
+
+        if (filter.budget) setBudgetData(filter.budget);
+        else setBudgetData(null);
+
+        if (filter.deadline) setDateData(filter.deadline);
+        else setDateData(null);
+
+        if (filter.post) setPostUpdateData(filter.post);
+        else setPostUpdateData(null);
+
+        if (filter.memberName != null) {
+          setTeamMemberData({
+            name: filter.memberName,
+            id: filter.memberId,
+          });
+        } else setTeamMemberData(null);
+
+        setBatonId(id);
+        setDataFetchLoading(false);
+        //  if baton is type draft then we do need to check below code
+        return;
+      }
+
+      if (
+        filter.authorPostStatus == "passed" ||
+        (filter.memberPostStatus == "received" &&
+          filter.memberId == isLogin.uid)
+      )
+        setIsEditable(false);
+      if (
+        filter.authorPostStatus == "deleted" ||
+        filter.authorPostStatus == "received"
+      )
+        setIsDeleted(true);
+
+      // "editable:", isEditable;
+
+      setFetchedDataObject(filter);
+      setTitle(filter.title);
+      setDescription(filter.description);
+
+      setBudgetData(filter.budget);
+      setDateData(filter.deadline);
+
+      setPostUpdateData(filter.post);
+      setTeamMemberData({
+        name: filter.memberName,
+        id: filter.memberId,
+      });
+      setBatonId(id);
+      setDataFetchLoading(false);
+      // console.log("filter", filter);
+      // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
+    } else {
+      let tempId = v4();
+      setBatonId(tempId);
+
+      setIsNewPost(true);
+      if (!loading) {
+        flushData();
+        console.log("new post dta flushed");
+      }
+    }
+
+    return () => null;
+  }, []);
+
+  // useEffect(() => {
+  //   navigation.addListener("beforeRemove", (e) => {
+  //     if (!allowGoBack) {
+  //       // console.log("ASDASD");
+  //       e.preventDefault();
+  //       setIsDraftModalVisible(true);
+  //     }
+  //   });
+  // }, [navigation]);
+
+  // console.log("batonID", batonId);
   return (
     <SafeAreaView style={styles.container}>
-      {fetchingLoading ? (
+      {/* Draft Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDraftModalVisible}
+        onRequestClose={() => setIsDraftModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View
+              style={{
+                width: widths.width80p,
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={{ fontSize: 20, fontWeight: "600" }}>Confirm</Text>
+              <AntDesign
+                name="close"
+                size={24}
+                color="black"
+                style={{ alignSelf: "flex-end" }}
+                onPress={() => setIsDraftModalVisible(false)}
+              />
+            </View>
+
+            <View
+              style={{
+                marginTop: 20,
+                width: widths.width80p,
+              }}
+            >
+              <View style={{ alignItems: "center" }}>
+                <Text style={{ fontSize: 16, textAlign: "justify" }}>
+                  You have unsaved changes to your Baton. Do you want to save
+                  your changes?
+                </Text>
+
+                {modalLoading ? (
+                  <ActivityIndicator
+                    style={{ marginTop: 20 }}
+                    size={26}
+                    color={colors.teal100}
+                  />
+                ) : (
+                  <>
+                    <Button
+                      mode="contained"
+                      onPress={() => {
+                        if (title === "")
+                          return toast.show("Title is required", {
+                            type: "warning",
+                            style: { height: 50 },
+                          });
+                        handleAddToDrafts();
+                      }}
+                      style={{
+                        width: widths.width80p,
+                        alignSelf: "center",
+                        marginTop: 25,
+                      }}
+                    >
+                      SAVE BATON
+                    </Button>
+                    <Button
+                      mode="outlined"
+                      onPress={() => {
+                        setIsDraftModalVisible(false);
+                        navigation.goBack();
+                      }}
+                      style={{
+                        width: widths.width80p,
+                        alignSelf: "center",
+                        marginTop: 10,
+                      }}
+                    >
+                      DISCARD
+                    </Button>
+                  </>
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {dataFetchLoading ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
@@ -429,60 +583,70 @@ export default function BatonFormScreen({ route, navigation }) {
           >
             <IconButton
               icon="arrow-left"
-              onPress={
-                () => navigation.dispatch(popAction)
-                // isDeleted
-                //   ? navigation.navigate("Deleted Batons")
-                //   : navigation.navigate("DashboardMain")
-              }
+              onPress={() => {
+                const isAnyFieldNotEmpty =
+                  teamMemberData != null ||
+                  dateData != null ||
+                  budgetData != null ||
+                  description != "" ||
+                  postUpdateData != null ||
+                  filesList != null ||
+                  title != "";
+
+                if (isAnyFieldNotEmpty && (isNewPost || isDraft)) {
+                  setIsDraftModalVisible(true);
+                } else {
+                  setIsDraftModalVisible(false);
+                  navigation.dispatch(popAction);
+                }
+              }}
               size={26}
             />
 
-            {!isDeleted &&
-              batonId != null &&
-              fetchedDataObject.authorId == isLogin.uid && (
-                <Menu
-                  visible={visible}
-                  onDismiss={closeMenu}
-                  anchor={
-                    <IconButton
-                      icon={({ size, color }) => (
-                        <Ionicons
-                          name="ellipsis-vertical"
-                          size={size}
-                          color={color}
-                        />
-                      )}
-                      onPress={openMenu}
-                      size={24}
-                    />
+            {doShowDropDownMenuOnPage && (
+              <Menu
+                visible={visible}
+                onDismiss={closeMenu}
+                anchor={
+                  <IconButton
+                    icon={({ size, color }) => (
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={size}
+                        color={color}
+                      />
+                    )}
+                    onPress={openMenu}
+                    size={24}
+                  />
+                }
+              >
+                <Menu.Item
+                  onPress={() =>
+                    showConfirmDialog(
+                      "Are your sure you want to remove this baton?",
+                      handleDeleteClick
+                    )
                   }
-                >
-                  <Menu.Item
-                    onPress={() =>
-                      showConfirmDialog(
-                        "Are your sure you want to remove this baton?",
-                        handleDeleteClick
-                      )
-                    }
-                    title="Delete"
-                    icon="delete"
-                    style={{ height: 35 }}
-                  />
-                  <Menu.Item
-                    onPress={() =>
-                      showConfirmDialog(
-                        "Are your sure you want to duplicate this baton?",
-                        handleDuplicateClick
-                      )
-                    }
-                    title="Duplicate"
-                    icon="file"
-                    style={{ height: 35 }}
-                  />
-                </Menu>
-              )}
+                  title="Delete"
+                  icon="delete"
+                  style={{ height: 35 }}
+                />
+                <Menu.Item
+                  onPress={() =>
+                    showConfirmDialog(
+                      "Are your sure you want to duplicate this baton?",
+                      handleDuplicateClick
+                    )
+                  }
+                  title="Duplicate"
+                  icon="file"
+                  style={{ height: 35 }}
+                />
+              </Menu>
+            )}
           </View>
+
           {isDeleted && (
             <NotificationBox
               text={`You deleted this on ${moment(
@@ -490,21 +654,17 @@ export default function BatonFormScreen({ route, navigation }) {
               ).format("MMMM DD ,YYYY")}`}
             />
           )}
+
           <View style={{ paddingLeft: 20, paddingRight: 20 }}>
             <TextInput
-              style={{ marginTop: 25 }}
+              style={{}}
               placeholder="Add Title"
               onChangeText={(e) => setTitle(e)}
               mode="outlined"
               outlineColor="transparent"
               placeholderTextColor="black"
               value={title}
-              disabled={
-                fetchedDataObject.authorPostStatus != "pending" &&
-                fetchedDataObject.authorPostStatus != undefined
-                  ? true
-                  : false
-              }
+              disabled={isTitleInputFieldDisabled}
             />
             <TextInput
               style={{ marginTop: 5 }}
@@ -513,31 +673,27 @@ export default function BatonFormScreen({ route, navigation }) {
               onChangeText={(e) => setDescription(e)}
               mode="outlined"
               value={description}
-              disabled={
-                fetchedDataObject.authorPostStatus != "pending" &&
-                fetchedDataObject.authorPostStatus != undefined
-                  ? true
-                  : false
-              }
+              disabled={isAddDescriptionInputFieldDisabled}
             />
+
+            {console.log(teamMemberData)}
             <Selectable
               style={{ marginTop: 25 }}
               bgColor={colors.azure}
-              isEditable={
-                editableFields?.teamMember &&
-                teamMemberData.text != "Select a team member"
-              }
-              text={teamMemberData.text.substring(0, 2).toUpperCase()}
-              isActive={teamMemberData.text != "Select a team member"}
+              isEditable={editableFields?.teamMember}
+              text={teamMemberData?.name?.substring(0, 2).toUpperCase()}
+              icon={!teamMemberData?.name && "account"}
+              isActive={activeItemIndex == 1 || teamMemberData}
               onPress={() =>
-                isEditable &&
-                !isDeleted &&
+                isSelectableItemPressable &&
                 navigation.navigate("MemberSelection", {
-                  setSelectedItem: (e) => setTeamMemberData(e),
+                  setItemSelected: (e) => setTeamMemberData(e),
+                  itemSelected: teamMemberData,
+                  batonId: batonId,
                 })
               }
             >
-              {teamMemberData.text}
+              {teamMemberData ? teamMemberData?.name : "Select a team member"}
             </Selectable>
 
             <Selectable
@@ -546,77 +702,70 @@ export default function BatonFormScreen({ route, navigation }) {
                 <AntDesign name="calendar" size={size} color={color} />
               )}
               isEditable={editableFields?.date && dateData != "Set a deadline"}
-              isActive={dateData != "Set a deadline"}
+              isActive={activeItemIndex == 2 || dateData}
               onPress={() =>
-                isEditable &&
-                !isDeleted &&
+                isSelectableItemPressable &&
                 navigation.navigate("DateSelection", {
                   setSelectedItem: (e) => setDateData(e),
                   selectedItem: dateData,
                 })
               }
             >
-              {dateData}
+              {dateData ? dateData : "Set a deadline"}
             </Selectable>
 
             <Selectable
-              isEditable={
-                editableFields?.budget && budgetData != "Set a budget"
-              }
+              isEditable={editableFields?.budget}
               bgColor={colors.azure}
               icon={({ color, size }) => (
                 <FontAwesome name="dollar" size={size} color={color} />
               )}
               onPress={() =>
-                isEditable &&
-                !isDeleted &&
+                isSelectableItemPressable &&
                 navigation.navigate("BudgetSelection", {
-                  setSelectedItem: (e) => setBudgetData(e),
-                  selectedItem: budgetData,
+                  setItemSelected: (e) => setBudgetData(e),
+                  itemSelected: budgetData,
                 })
               }
-              isActive={budgetData != "Set a budget"}
+              isActive={activeItemIndex == 3 || budgetData}
             >
-              {budgetData}
+              {budgetData
+                ? `${budgetData != "N/A" ? "$" : ""}${budgetData}`
+                : "Set a budget"}
             </Selectable>
-
+            {console.log(filesList?.length)}
             <Selectable
-              isEditable={
-                editableFields?.files && filesList.text != "Attach a file"
-              }
+              isEditable={editableFields?.files}
               bgColor={colors.azure}
               icon="attachment"
-              isActive={
-                filesList.filesList.length > 0 || batonId != null ? true : false
-              }
+              isActive={activeItemIndex == 4 || filesList || id}
               onPress={() =>
                 !isDeleted &&
                 navigation.navigate("FileSelection", {
-                  setSelectedItem: (e) => setFilesList(e),
-                  selectedItem: filesList,
-                  batonId: id,
+                  setItemSelected: (e) => setFilesList(e),
+                  itemSelected: filesList,
+                  batonId: batonId,
                 })
               }
             >
-              {/* {filesList.filesList.length > 0
-              ? `${filesList.filesList.length} files attached`
-              : "Attach a file (Optional)"} */}
-              {filesList.text}
+              {filesList
+                ? filesList.length + " files attached"
+                : "Attach a file"}
             </Selectable>
 
             <Selectable
-              isEditable={editableFields?.postUpdate && postUpdateData != ""}
+              isEditable={editableFields?.postUpdate}
               bgColor={colors.azure}
               icon="post"
               onPress={() =>
                 !isDeleted &&
                 navigation.navigate("PostUpdateSelection", {
-                  setSelectedItem: (e) => setPostUpdateData(e),
-                  selectedItem: postUpdateData,
-                  batonId: id,
+                  setItemSelected: (e) => setPostUpdateData(e),
+                  itemSelected: postUpdateData,
+                  batonId: batonId,
                 })
               }
-              isActive={postUpdateData != ""}
+              isActive={activeItemIndex == 5 || postUpdateData}
             >
               Post an update
             </Selectable>
@@ -628,7 +777,15 @@ export default function BatonFormScreen({ route, navigation }) {
                 isEditable &&
                 !isDeleted && (
                   <TealButton
-                    disabled={disabled}
+                    disabled={
+                      !(
+                        dateData != null &&
+                        budgetData != null &&
+                        teamMemberData != null &&
+                        title != "" &&
+                        description != ""
+                      )
+                    }
                     onPress={handlePass}
                     text="Pass"
                   />
@@ -646,5 +803,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // marginTop: Platform.OS === "android" ? 24 : 0
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
   },
 });

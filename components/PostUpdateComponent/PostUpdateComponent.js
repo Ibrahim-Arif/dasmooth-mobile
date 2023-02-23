@@ -14,8 +14,8 @@ import logResponse from "../../utilities/logger";
 import { v4 } from "uuid";
 
 export default function PostUpdateComponent({
-  selectedItem,
-  setSelectedItem,
+  itemSelected,
+  setItemSelected,
   closeScreen,
   batonId = null,
 }) {
@@ -24,11 +24,9 @@ export default function PostUpdateComponent({
   const { isLogin, photoURL } = useUser();
   const toast = useToast();
 
-  useEffect(() => setText(selectedItem), []);
   useEffect(() => {
-    if (batonId != null) handleGetBatonPostUpdates(batonId, setPostData);
+    if (itemSelected) setPostData(itemSelected);
   }, []);
-  // console.log(postData);
 
   const handlePostUpdate = () => {
     let url =
@@ -46,13 +44,14 @@ export default function PostUpdateComponent({
       };
 
       setText("");
-      setSelectedItem("some update added");
+      setItemSelected("some update added");
       handleAddPostUpdate(data)
         .then(() => {
           toast.show("Post Update Successfully", {
             type: "success",
             style: { height: 50 },
           });
+          setPostData((pre) => [data, ...pre]);
         })
         .catch((ex) => {
           logResponse("error", ex.message);

@@ -2,13 +2,13 @@ import React from "react";
 import { FileAttachmentComponent, FormScreen } from "../components";
 
 export default function FileFormScreen({ route, navigation }) {
-  const { selectedItem, setSelectedItem, batonId } = route.params;
+  const { itemSelected, setItemSelected, batonId } = route.params;
   // console.log(batonId);
   return (
     <FormScreen title="Attach a file" navigation={navigation}>
       <FileAttachmentComponent
-        setSelectedItem={setSelectedItem}
-        selectedItem={selectedItem}
+        itemSelected={itemSelected}
+        setItemSelected={setItemSelected}
         closeScreen={() => navigation.goBack()}
         batonId={batonId}
       />

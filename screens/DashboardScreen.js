@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import {
   View,
@@ -42,9 +42,17 @@ export default function DashboardScreen({ navigation }) {
   const [DeclinedBatons, setDeclinedBatons] = useState([]);
   const [AcceptedBatons, setAcceptedBatons] = useState([]);
   const [CompleteBatons, setCompleteBatons] = useState([]);
+  const [DraftBatons, setDraftBatons] = useState([]);
   const [activeBatons, setActiveBatons] = useState(Object.values(batons));
 
-  const statuses = ["pending", "passed", "received", "declined", "complete"];
+  const statuses = [
+    "pending",
+    "passed",
+    "received",
+    "declined",
+    "complete",
+    "draft",
+  ];
 
   const filterBatons = (batonData, batonName) => {
     // console.log(batonsList)
@@ -65,14 +73,25 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  const getBaton = {
-    PendingBatons,
-    PassedBatons,
-    ReceivedBatons,
-    DeclinedBatons,
-    AcceptedBatons,
-    CompleteBatons,
-  };
+  const getBaton = useMemo(() => {
+    return {
+      PendingBatons,
+      PassedBatons,
+      ReceivedBatons,
+      DeclinedBatons,
+      AcceptedBatons,
+      CompleteBatons,
+      DraftBatons,
+    };
+  }, [
+    JSON.stringify(PendingBatons),
+    JSON.stringify(PassedBatons),
+    JSON.stringify(ReceivedBatons),
+    JSON.stringify(DeclinedBatons),
+    JSON.stringify(AcceptedBatons),
+    JSON.stringify(CompleteBatons),
+    JSON.stringify(DraftBatons),
+  ]);
   const onChangeSearch = (query) => setSearchQuery(query);
   const renderItem = ({ item, drag, isActive }, data) => (
     <ScaleDecorator>
@@ -112,13 +131,17 @@ export default function DashboardScreen({ navigation }) {
     filterBatons(declined, "declined");
     setDeclinedBatons(declined);
 
+    let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
+    filterBatons(draft, "draft");
+    setDraftBatons(draft);
+
     let complete = filterBatonsData(batonsData, "complete");
     // console.log("coomp", complete);
     filterBatons(complete, "complete");
     setCompleteBatons(complete);
 
     // console.log(batons);
-  }, [batonsData]);
+  }, [JSON.stringify(batonsData)]);
 
   useEffect(() => {
     if (searchQuery == "") {
@@ -186,7 +209,7 @@ export default function DashboardScreen({ navigation }) {
               icon={() => <Entypo name="plus" size={24} color="white" />}
               style={{ width: 220, backgroundColor: colors.tealDark30 }}
               onPress={() => {
-                navigation.navigate("BatonForm", { batonId: null });
+                navigation.navigate("BatonForm", { id: null });
               }}
             />
           </View>

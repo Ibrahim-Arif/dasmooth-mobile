@@ -21,88 +21,61 @@ import logResponse from "../../utilities/logger";
 import { v4 } from "uuid";
 
 export default function FileAttachmentComponent({
-  selectedItem,
-  setSelectedItem,
+  itemSelected,
+  setItemSelected,
   closeScreen,
   batonId,
 }) {
-  const [fileData, setFileData] = useState({ filesList: [] });
+  const [uploadableFiles, setUploadableFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  // const [selectedImageToView, setSelectedImageToView] = useState("");
-  // const [isVisible, setIsVisible] = useState(false);
-  const [uploadCount, setUploadCount] = useState(0);
   const toast = useToast();
+
   const [status, requestPermission] = MediaLibrary.usePermissions();
-
-  // const showModal = () => setIsVisible(true);
-  // const hideModal = () => setIsVisible(false);
-
-  // const pickImage = async () => {
-  //   // No permissions request is necessary for launching the image library
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
-  //   });
-  //   // console.log("\n\n\nRESULT:'");
-  //   // console.log(result);
-  //   const items = [...fileData.filesList];
-  //   if (!result.cancelled) {
-  //     let fileName = "";
-  //     fileName = result.uri.split("/").slice(-1)[0];
-  //     result.fileName = fileName;
-  //     items.push(result);
-  //     setFileData({ ...fileData, filesList: items });
-  //     // console.log(items);
-  //   }
-  // };
 
   const pickFile = async () => {
     let result = await DocumentPicker.getDocumentAsync({});
     // console.log("\n\n\nRESULT:'");
     // console.log(result);
-    const items = [...fileData.filesList];
-    if (!result.cancelled) {
-      let temp = { ...result };
-      temp.fileName = result.name;
-      items.push(temp);
-      setFileData({ ...fileData, filesList: items });
+    if (!result.cancelled && result.type != "cancel") {
+      let file = { ...result };
+      file.fileName = result.name;
+      setUploadableFiles((fileData) => [...fileData, file]);
       // console.log(items);
     }
   };
-  const handleRemoveFile = (index) => {
-    let temp = fileData.filesList;
-    delete temp[index];
 
-    setFileData({
-      ...fileData,
-      filesList: temp.filter((e) => e != undefined),
+  const handleRemoveFile = (index) => {
+    setUploadableFiles((fileData) => {
+      const newFileList = fileData.slice();
+      newFileList.splice(index, 1);
+      return [...newFileList];
     });
   };
 
   const handleUpload = () => {
+    if (uploadableFiles?.length == 0) return;
     if (batonId == null) {
       toast.show("Baton Id is null", { type: "danger" });
       return;
     }
-    if (fileData.filesList.length == 0) return;
+
     setUploading(true);
 
-    for (let i = 0; i < fileData.filesList.length; i++) {
-      console.log(fileData.filesList[i]);
+    for (let i = 0; i < uploadableFiles.length; i++) {
+      // console.log(uploadableFiles[i]);
       handleUploadFile(
-        fileData.filesList[i].uri,
-        fileData.filesList[i].fileName,
+        uploadableFiles[i].uri,
+        uploadableFiles[i].fileName,
         batonId
       )
         .then((res) => {
           let filesData = {
             file: res,
             batonId: batonId,
-            fileName: fileData.filesList[i].fileName,
+            fileName: uploadableFiles[i].fileName,
           };
-
-          setFileData({ filesList: [] });
 
           handleAddBatonFiles(filesData)
             .then(() => {
@@ -111,17 +84,19 @@ export default function FileAttachmentComponent({
                 type: "success",
                 style: { height: 50 },
               });
+              if (itemSelected == null) {
+                setItemSelected([filesData]);
+              } else setItemSelected((prev) => [...prev, filesData]);
               setUploading(false);
-              setUploadCount(uploadCount + 1);
-
-              // clickOk();
+              setUploadableFiles([]);
+              closeScreen();
             })
             .catch((ex) => {
-              toast.show("Error uploading files", {
+              toast.show("Error adding files doc", {
                 type: "danger",
                 style: { height: 50 },
               });
-              // generateNotification("error", "Failed to upload files!");
+
               setUploading(false);
             });
         })
@@ -131,7 +106,7 @@ export default function FileAttachmentComponent({
             type: "danger",
             style: { height: 50 },
           });
-          // generateNotification("error", "Failed to upload files!");
+
           setUploading(false);
         });
     }
@@ -186,32 +161,15 @@ export default function FileAttachmentComponent({
   };
 
   useEffect(() => {
-    return () => {
-      // console.log(fileData);
-      // if imagedata or uploadedfiles is empty, then it means that the user has not uploaded any files
-      if (fileData.filesList.length == 0 && uploadedFiles.length == 0)
-        setSelectedItem({
-          filesList: [...fileData.filesList, ...uploadedFiles],
-          text: "Attach a file",
-        });
-      // else there are some files which we want to send to the baton form screen
-      // so that we can show the files length in the baton form screen
-      else
-        setSelectedItem({
-          filesList: [...fileData.filesList, ...uploadedFiles],
-          text: `${uploadedFiles.length} files attached`,
-        });
-    };
-  }, [fileData, uploadedFiles]);
-
-  useEffect(() => {
-    // console.log(batonId);
-    // fetching the baton files from firebase
-    handleGetBatonFiles(batonId, setUploadedFiles);
-  }, []);
+    // handleGetBatonFilesSnapshotSnapshot(batonId, setUploadedFiles);
+    if (itemSelected != null && batonId != null) {
+      setUploadedFiles(itemSelected);
+    }
+    console.log("batonFiles useEffect", itemSelected?.length);
+  }, [itemSelected?.length]);
 
   return (
-    <View style={{ padding: 20 }}>
+    <ScrollView style={{ padding: 20 }} showsVerticalScrollIndicator={false}>
       {/* Drag and Drop Container */}
 
       <TouchableNativeFeedback onPress={pickFile}>
@@ -231,8 +189,8 @@ export default function FileAttachmentComponent({
         {!uploading && (
           <>
             <View style={{ marginTop: 15 }}>
-              {fileData.filesList &&
-                fileData.filesList.map((e, index) => (
+              {uploadableFiles.length > 0 &&
+                uploadableFiles.map((e, index) => (
                   <View key={v4()}>
                     <TouchableNativeFeedback
                       onPress={() => handleRemoveFile(index)}
@@ -259,7 +217,8 @@ export default function FileAttachmentComponent({
                   </View>
                 ))}
             </View>
-            <View style={{}}>
+
+            <View>
               {uploadedFiles.map((e, index) => (
                 <View key={v4()}>
                   <TouchableNativeFeedback
@@ -300,10 +259,7 @@ export default function FileAttachmentComponent({
 
       {!uploading && (
         <ColoredText color="teal" style={styles.attachFileText}>
-          {fileData.filesList.length > 0
-            ? fileData.filesList.length + uploadedFiles.length
-            : uploadedFiles.length}{" "}
-          files attached
+          {uploadedFiles.length + uploadableFiles.length} files attached
         </ColoredText>
       )}
 
@@ -318,7 +274,9 @@ export default function FileAttachmentComponent({
           />
         )}
       </View>
-    </View>
+
+      <View style={{ height: 50 }} />
+    </ScrollView>
   );
 }
 

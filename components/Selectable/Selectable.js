@@ -19,7 +19,9 @@ export default function Selectable({
   batonType = null,
   isEditable = false,
   textColor = null,
+  name = null,
   style,
+
   labelStyle,
   disabled = false,
   iconBgColor = null,
@@ -122,12 +124,12 @@ export default function Selectable({
             fontWeight: "400",
             marginLeft: 15,
             flexShrink: 1,
-            width: "70%",
             ...labelStyle,
           }}
         >
           {children}
         </Text>
+
         {isEditable && (
           <Ionicons
             name="pencil"

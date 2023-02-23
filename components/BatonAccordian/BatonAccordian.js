@@ -39,7 +39,7 @@ export default function BatonAccordian({
       <TouchableNativeFeedback
         onPress={() => {
           // setFocused(true);
-          navigation.navigate("BatonForm", { batonId: docId });
+          navigation.navigate("BatonForm", { id: docId });
           // setFocused(false);
         }}
         key={v4()}
@@ -90,7 +90,7 @@ export default function BatonAccordian({
         onPress={() => setPressed(!pressed)}
       >
         {listItems.map((e, index) => (
-          <CustomListItem title={e.title} docId={e.docId} />
+          <CustomListItem title={e.title} docId={e.docId} key={index} />
         ))}
       </List.Accordion>
     </View>
