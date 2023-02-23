@@ -5,7 +5,11 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-export const handleGetNotifications = async (uid, setData) => {
+export const handleGetNotifications = async (
+  uid,
+  setData,
+  setLoading = () => null
+) => {
   try {
     // console.log(uid);
     const db = getFirestore();
@@ -23,6 +27,7 @@ export const handleGetNotifications = async (uid, setData) => {
       });
       //   console.log(tempData);
       setData(tempData);
+      setLoading(false);
     });
   } catch (ex) {
     throw new Error(ex);

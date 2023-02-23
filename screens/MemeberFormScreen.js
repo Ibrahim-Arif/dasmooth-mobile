@@ -4,7 +4,6 @@ import { useUser } from "../hooks/useContext";
 
 export default function MemeberFormScreen({ route, navigation }) {
   const { itemSelected, setItemSelected, batonId } = route.params;
-  console.log(route.params);
   const { teamMembers } = useUser();
   return (
     <FormScreen title="Select a team member" navigation={navigation}>

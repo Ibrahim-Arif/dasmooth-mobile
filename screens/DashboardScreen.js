@@ -108,53 +108,68 @@ export default function DashboardScreen({ navigation }) {
     </ScaleDecorator>
   );
   useEffect(() => {
-    console.log("DashBoardView");
-    // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
-    // console.log(batonsData);
-    let pending = filterBatonsData(batonsData, "pending", isLogin.uid);
-    filterBatons(pending, "pending");
-    setPendingBatons(pending);
+    let isMounted = true;
 
-    let passed = filterBatonsData(batonsData, "passed", isLogin.uid);
-    filterBatons(passed, "passed");
-    setPassedBatons(passed);
+    if (isMounted) {
+      console.log("DashBoardView");
+      // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
+      // console.log(batonsData);
+      let pending = filterBatonsData(batonsData, "pending", isLogin.uid);
+      filterBatons(pending, "pending");
+      setPendingBatons(pending);
 
-    let received = filterBatonsData(batonsData, "received", isLogin.uid);
-    filterBatons(received, "received");
-    setReceivedBatons(received);
+      let passed = filterBatonsData(batonsData, "passed", isLogin.uid);
+      filterBatons(passed, "passed");
+      setPassedBatons(passed);
 
-    let accepted = filterBatonsData(batonsData, "accepted", isLogin.uid);
-    filterBatons(accepted, "accepted");
-    setDeclinedBatons(accepted);
+      let received = filterBatonsData(batonsData, "received", isLogin.uid);
+      filterBatons(received, "received");
+      setReceivedBatons(received);
 
-    let declined = filterBatonsData(batonsData, "declined", isLogin.uid);
-    filterBatons(declined, "declined");
-    setDeclinedBatons(declined);
+      let accepted = filterBatonsData(batonsData, "accepted", isLogin.uid);
+      filterBatons(accepted, "accepted");
+      setDeclinedBatons(accepted);
 
-    let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
-    filterBatons(draft, "draft");
-    setDraftBatons(draft);
+      let declined = filterBatonsData(batonsData, "declined", isLogin.uid);
+      filterBatons(declined, "declined");
+      setDeclinedBatons(declined);
 
-    let complete = filterBatonsData(batonsData, "complete");
-    // console.log("coomp", complete);
-    filterBatons(complete, "complete");
-    setCompleteBatons(complete);
+      let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
+      filterBatons(draft, "draft");
+      setDraftBatons(draft);
+
+      let complete = filterBatonsData(batonsData, "complete");
+      // console.log("coomp", complete);
+      filterBatons(complete, "complete");
+      setCompleteBatons(complete);
+    }
+    return () => {
+      isMounted = false;
+    };
 
     // console.log(batons);
   }, [JSON.stringify(batonsData)]);
 
   useEffect(() => {
-    if (searchQuery == "") {
-      setBatonsData(permanentData);
-    } else {
-      let temp = [...permanentData];
-      temp = temp.filter(
-        (e) =>
-          e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          e.memberName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setBatonsData(temp);
+    let isMounted = true;
+
+    if (isMounted) {
+      if (searchQuery == "") {
+        setBatonsData(permanentData);
+      } else {
+        let temp = [...permanentData];
+        temp = temp.filter(
+          (e) =>
+            e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            e.memberName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setBatonsData(temp);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [searchQuery]);
 
   return (

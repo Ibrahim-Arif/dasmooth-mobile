@@ -5,7 +5,12 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-export const handleGetOtherBatons = async (uid, data, setData) => {
+export const handleGetOtherBatons = async (
+  uid,
+  data,
+  setData,
+  setLoading = () => null
+) => {
   try {
     const db = getFirestore();
 
@@ -16,6 +21,7 @@ export const handleGetOtherBatons = async (uid, data, setData) => {
         tempData.push({ docId: doc.id, ...doc.data() });
       });
       setData(tempData);
+      setLoading(false);
     });
   } catch (ex) {
     throw new Error(ex);

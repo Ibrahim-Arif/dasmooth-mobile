@@ -133,14 +133,17 @@ export default function NotificationScreen({ navigation, route }) {
           showsVerticalScrollIndicator={false}
         >
           {sectionSortedNotifications.map((item, index) => (
-            <View key={v4()} style={index > 0 ? { marginTop: 32 } : {}}>
+            <View
+              key={item?.toString()}
+              style={index > 0 ? { marginTop: 32 } : {}}
+            >
               <Text>
                 {moment(jsCoreDateCreator(item.date)).format("MMM DD, YYYY")}
               </Text>
 
               {item.notifications?.map((notification, index) => (
                 <Alert
-                  key={v4()}
+                  key={notification?.toString()}
                   batonTitle={notification.message}
                   batonName={notification.message}
                   batonDescription={notification.description}

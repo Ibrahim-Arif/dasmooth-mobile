@@ -162,6 +162,7 @@ export default function FileAttachmentComponent({
 
   useEffect(() => {
     // handleGetBatonFilesSnapshotSnapshot(batonId, setUploadedFiles);
+
     if (itemSelected != null && batonId != null) {
       setUploadedFiles(itemSelected);
     }
@@ -191,7 +192,7 @@ export default function FileAttachmentComponent({
             <View style={{ marginTop: 15 }}>
               {uploadableFiles.length > 0 &&
                 uploadableFiles.map((e, index) => (
-                  <View key={v4()}>
+                  <View key={index}>
                     <TouchableNativeFeedback
                       onPress={() => handleRemoveFile(index)}
                     >

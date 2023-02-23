@@ -188,7 +188,9 @@ export default function BatonFormScreen({ route, navigation }) {
         title: title,
         description: description,
         memberName: teamMemberData.name,
+        memberId: teamMemberData.id,
         updateOn: Date.now(),
+        authorPostStatus: "passed",
       };
       console.log("editedPost", editedPost);
       // console.log(editedPost);
@@ -337,7 +339,7 @@ export default function BatonFormScreen({ route, navigation }) {
         files: true,
       };
     } else {
-      console.log(fetchedDataObject);
+      // console.log(fetchedDataObject);
       if (fetchedDataObject.authorId == isLogin.uid)
         switch (fetchedDataObject.authorPostStatus) {
           case "pending":

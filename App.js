@@ -4,6 +4,7 @@ import { registerRootComponent } from "expo";
 import { StackNavigaiton } from "./navigation/StackNavigation";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
+import * as SplashScreen from "expo-splash-screen";
 import { ToastProvider } from "react-native-toast-notifications";
 import { colors } from "./utilities/colors";
 import { initializeApp } from "firebase/app";
@@ -29,6 +30,9 @@ const theme = {
 };
 initializeApp(firebaseConfig);
 // console.log(DefaultTheme.colors);
+
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
   LogBox.ignoreLogs([
     "Non-serializable values were found in the navigation state",
@@ -36,7 +40,6 @@ export default function App() {
   ]);
 
   const [isLogin, setIsLogin] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [permanentData, setPermanentData] = useState([]);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -45,6 +48,11 @@ export default function App() {
   const [notifications, setNotifications] = useState([]);
   const [myBatons, setMyBatons] = useState([]);
   const [otherBatons, setOtherBatons] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [teamMembersLoading, setTeamMembersLoading] = useState(true);
+  const [myBatonsLoading, setMyBatonsLoading] = useState(true);
+  const [otherBatonsLoading, setOtherBatonsLoading] = useState(true);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
 
   const auth = getAuth();
   const userContextValues = {
@@ -64,16 +72,43 @@ export default function App() {
     setPhotoURL,
   };
 
+  const hideSplashScreen = async () => {
+    await SplashScreen.hideAsync();
+  };
+
   useEffect(() => {
     // logResponse("info", isLogin.photoURL);
     let isMounted = true;
     if (isMounted)
       if (isLogin) {
+        // setTeamMembersLoading(true);
+        // setMyBatonsLoading(true);
+        // setOtherBatonsLoading(true);
+        // setNotificationsLoading(true);
+
         setPhotoURL(isLogin.photoURL);
-        handleGetTeamMembers(isLogin.uid, setTeamMembers);
-        handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
-        handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
-        handleGetNotifications(isLogin.uid, setNotifications);
+        handleGetTeamMembers(
+          isLogin.uid,
+          setTeamMembers,
+          setTeamMembersLoading
+        );
+        handleGetMyBatons(
+          isLogin.uid,
+          myBatons,
+          setMyBatons,
+          setMyBatonsLoading
+        );
+        handleGetOtherBatons(
+          isLogin.uid,
+          otherBatons,
+          setOtherBatons,
+          setOtherBatonsLoading
+        );
+        handleGetNotifications(
+          isLogin.uid,
+          setNotifications,
+          setNotificationsLoading
+        );
       } else {
         setPermanentData([]);
         setBatonsData([]);
@@ -90,11 +125,6 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
-      onAuthStateChanged(auth, (user) => {
-        if (user && user.emailVerified) {
-          setIsLogin(user);
-        }
-      });
       // console.log("batonsData useEffect, App.js", batonsData);
       let temp = [...myBatons, ...otherBatons];
       // temp = [...new Set(temp)]
@@ -113,7 +143,7 @@ export default function App() {
       isMounted = false;
     };
     // console.log("Permanent:", permanentData);
-  }, [myBatons, otherBatons]);
+  }, [JSON.stringify(myBatons), JSON.stringify(otherBatons)]);
 
   useEffect(() => {
     let isMounted = true;
@@ -121,7 +151,43 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, [permanentData]);
+  }, [JSON.stringify(permanentData)]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      if (
+        !myBatonsLoading &&
+        !otherBatonsLoading &&
+        !teamMembersLoading &&
+        !notificationsLoading
+      )
+        hideSplashScreen();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    myBatonsLoading,
+    otherBatonsLoading,
+    teamMembersLoading,
+    notificationsLoading,
+  ]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        setIsLogin(user);
+      } else {
+        setTeamMembersLoading(false);
+        setMyBatonsLoading(false);
+        setOtherBatonsLoading(false);
+        setNotificationsLoading(false);
+        hideSplashScreen();
+      }
+    });
+  }, []);
 
   return (
     <StateProvider values={userContextValues}>

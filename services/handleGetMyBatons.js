@@ -5,7 +5,12 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-export const handleGetMyBatons = async (uid, data, setData) => {
+export const handleGetMyBatons = async (
+  uid,
+  data,
+  setData,
+  setLoading = () => null
+) => {
   try {
     const db = getFirestore();
     const q = query(collection(db, "batons"), where("authorId", "==", uid));
@@ -17,6 +22,7 @@ export const handleGetMyBatons = async (uid, data, setData) => {
       });
       // console.log(tempData);
       setData(tempData);
+      setLoading(false);
     });
   } catch (ex) {
     throw new Error(ex);

@@ -653,7 +653,7 @@ export default function TeamMembersScreen({ navigation, route }) {
         >
           {members.map((e, index) => (
             <Selectable
-              key={v4()}
+              key={index}
               text={e.name.substring(0, 2).toUpperCase()}
               onPress={() => {
                 setDeleteMember(e);

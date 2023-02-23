@@ -279,8 +279,17 @@ export default function MemberSelectionComponent({
         }}
       >
         {isInviteSent == true && (
-          <View>
-            <Text>Invite sent to {inviteSentTo}</Text>
+          <View
+            style={{
+              paddingVertical: 10,
+              backgroundColor: colors.mosque,
+              paddingLeft: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: "white" }}>
+              Invite sent to {inviteSentTo}
+            </Text>
           </View>
         )}
         <Formik
@@ -679,9 +688,9 @@ export default function MemberSelectionComponent({
               alignItems: "center",
               justifyContent: "space-between",
             }}
+            key={index}
           >
             <Selectable
-              key={v4()}
               text={e.name.substring(0, 2).toUpperCase()}
               onPress={() => {
                 if (!formMode) {

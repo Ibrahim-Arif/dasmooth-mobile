@@ -42,7 +42,7 @@ export default function BatonAccordian({
           navigation.navigate("BatonForm", { id: docId });
           // setFocused(false);
         }}
-        key={v4()}
+        key={docId}
       >
         <View
           style={[

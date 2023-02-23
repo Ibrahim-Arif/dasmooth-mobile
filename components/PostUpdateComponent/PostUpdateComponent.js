@@ -82,7 +82,7 @@ export default function PostUpdateComponent({
       >
         <View>
           {postData.map((e, i) => (
-            <View key={v4()} style={styles.commentContainer}>
+            <View key={i} style={styles.commentContainer}>
               <View style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}>
                 {e.photoURL != "" && e.photoURL ? (
                   <Avatar.Image source={{ uri: e.photoURL }} size={54} />
